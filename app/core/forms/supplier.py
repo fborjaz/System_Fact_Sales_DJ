@@ -39,7 +39,7 @@ class SupplierForm(ModelForm):
 
   class Meta:
     model = Supplier
-    fields = ["name", "ruc", "address", "phone", "latitude", "longitude", "active", "image"]
+    fields = ["name", "ruc", "address", "phone", "active", "image"]
     error_messages = {
         "ruc": {
                 "unique": "Ya existe un proveedor con este RUC.",
