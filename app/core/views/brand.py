@@ -41,7 +41,7 @@ class BrandListView(PermissionMixin, ListViewMixin, ListView):
       brands = paginator.page(paginator.num_pages)
 
     context['brands'] = brands
-    context['title1'] = 'Marcas'
+    context['title1'] = 'IC - Marcas'
     context['title2'] = 'Consulta de Marcas'
     context['create_url'] = reverse_lazy('core:brand_create')
     context['query'] = self.request.GET.get('q', '')
@@ -57,7 +57,7 @@ class BrandCreateView(PermissionMixin, CreateViewMixin, CreateView):
 
   def get_context_data(self, **kwargs):
     context = super().get_context_data(**kwargs)
-    context['title1'] = 'Crear Marca'
+    context['title1'] = 'IC - Crear Marca'
     context['title2'] = 'Marca'
     context['back_url'] = self.success_url
     return context
@@ -78,7 +78,7 @@ class BrandUpdateView(PermissionMixin, UpdateViewMixin, UpdateView):
 
   def get_context_data(self, **kwargs):
     context = super().get_context_data(**kwargs)
-    context['title1'] = 'Actualizar Marca'
+    context['title1'] = 'IC - Actualizar Marca'
     context['title2'] = 'Actualizar Datos De La Marca'
     context['back_url'] = self.success_url
     return context
@@ -102,7 +102,7 @@ class BrandDeleteView(PermissionMixin, DeleteViewMixin, DeleteView):
 
   def get_context_data(self, **kwargs):
     context = super().get_context_data(**kwargs)
-    context['title'] = 'Eliminar Marca'
+    context['title'] = 'IC - Eliminar Marca'
     context['description'] = f"¿Desea eliminar la marca: {self.object.description}?"
     context['back_url'] = self.success_url
     return context

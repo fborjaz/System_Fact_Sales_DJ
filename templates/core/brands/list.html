@@ -36,14 +36,13 @@
 
 
             <div class="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                {% for item in brand %}
+                {% for item in brands %}
                     <div class="backdrop-blur-md mb-4 flex justify-center custom-transform relative">
                         <div class="dark:bg-secundario relative w-full overflow-hidden rounded-lg border border-gray-100 bg-white shadow-md dark:border-none">
                             <div class="dark:bg-secundario text-center card card-custom">
                                 <figure class="px-10 pt-10">
                                     <img class="mx-auto w-15 h-15 object-contain rounded-2xl"
                                          src=" 
-                                                 
                                                  {% if item.image %}{{ item.image.url }}{% else %}{% static 'img/incognito.png' %}{% endif %}"
                                          alt="Imagen del proveedor">
                                 </figure>
