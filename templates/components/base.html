@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% load static tailwind_tags %}
+    <!-- Tailwind css -->
+    {% tailwind_css %}
+    <!-- Flowbite JS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.5/flowbite.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.5/flowbite.min.js"></script>
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="{% static 'img/logo.png' %}" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+          integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"/>
+    <!-- AOS Library -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css"
+          integrity="sha512-1cK78a1o+ht2JcaW6g8OXYwqpev9+6GqOkz9xmBN9iUUhIndKtxwILGWYOSibOKjLsEdjyjZvYDq/cZwNeak0w=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"/>
+    <!-- Iconos -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
+    <!-- Whatsapp -->
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'plugin/whatsapp-chat-support.css' %}">
+    <link rel="stylesheet" href="{% static 'plugin/components/Font Awesome/css/font-awesome.min.css' %}">
+    <!-- Titulo -->
+    <title>{% block title %} SGV {% endblock title %}</title>
+
+    <script>
+        // Aplicar el tema tan pronto como sea posible
+        (function () {
+            const isDarkModeEnabled = localStorage.getItem('darkModeEnabled') === 'true';
+            if (isDarkModeEnabled) {
+                document.documentElement.classList.add('dark');
+            }
+            document.documentElement.classList.add('loaded');
+        })();
+        (function () {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.className = savedTheme;
+            document.documentElement.classList.add('loaded');
+        })();
+    </script>
+
+
+    <style>
+        {#estilo para la barra de navegacion#}
+        html::-webkit-scrollbar {
+            width: 0;
+        }
+
+        /* ANIMACIÓN DE CARGA */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.9); /* Bacground de fondo */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999; /* Posicionarce sobre todos los elementos */
+        }
+
+        .relative {
+            position: relative;
+        }
+
+        .h-24 {
+            height: 6rem; /* 24 * 0.25rem */
+        }
+
+        .w-24 {
+            width: 6rem; /* 24 * 0.25rem */
+        }
+
+        .rounded-full {
+            border-radius: 9999px;
+        }
+
+        .border-t-8 {
+            border-top-width: 8px;
+        }
+
+        .border-b-8 {
+            border-bottom-width: 8px;
+        }
+
+        .border-gray-200 {
+            border-color: #edf2f7; /* Tailwind's gray-200 */
+        }
+
+        .border-blue-500 {
+            border-color: #4299e1; /* Tailwind's blue-500 */
+        }
+
+        .animate-spin {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+    </style>
+
+    <style>
+
+        /* Cuadro de la paleta de temas */
+        .rect {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            width: 60px;
+            height: 60px;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            margin-right: 1rem;
+        }
+
+        .rect div {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* SECCIÓN DE TEMAS */
+        /* TEMA NARANJA */
+        .theme1 .text-primary {
+            color: #ffccbc;
+        }
+
+        .theme1 .bg-primary {
+            background-color: #fff7ed;
+            color: white;
+        }
+
+        .theme1 .text-secondary {
+            color: orange;
+        }
+
+        .theme1 .bg-navbar {
+            background-color: #ff9800;
+            color: white;
+        }
+
+        .theme1 .border {
+            border-color: orange;
+        }
+
+        .theme1 .text {
+            text: white
+        }
+
+        .theme1 .hero-background {
+            background-image: url('{% static 'img/background.png' %}') !important;
+        }
+
+        /* TEMA AZUL */
+        .theme2 .text-primary {
+            color: #cfe8ff;
+        }
+
+        .theme2 .bg-primary {
+            background-color: #e3f2fd;
+            color: white;
+        }
+
+        .theme2 .text-secondary {
+            color: #007bff;
+        }
+
+        .theme2 .bg-navbar {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .theme2 .border {
+            border-color: blue;
+        }
+
+        .theme2 .text {
+            text: white
+        }
+
+        .theme2 .hero-background {
+            background-image: url('{% static 'img/fondo_azul.png' %}') !important;
+        }
+
+    </style>
+
+</head>
+<body class="text-secondary loading text-items font-Quicksand text-lg font-light">
+
+<!-- Div de la anuimación de carga -->
+<div id="loader" class="overlay dark:bg-black">
+    <div class="relative">
+        <div class="h-24 w-24 rounded-full border-t-8 border-b-8 border-gray-200"></div>
+        <div class="absolute top-0 left-0 h-24 w-24 rounded-full border-t-8 border-b-8 border border-blue-500 animate-spin"></div>
+    </div>
+</div>
+
+
+<!-- Navbar -->
+{% block navbar %}
+    <header class="bg-navbar top-0 left-0 right-0 z-50 bg-transparent fixed w-full transition duration-300 ease-in-out">
+        <nav class="border-gray-200 dark:bg-principal">
+            <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+                <a href="/admin" class="flex items-center space-x-3 rtl:space-x-reverse">
+                    <img src="{% static 'img/iguana_corporation.png' %}" class="w-12 h-12" alt="Iguanas Corp"/>
+                    <span class="self-center whitespace-nowrap text dark:text-blue-300 font-extrabold">Iguanas Corp.</span>
+                </a>
+                <div class="flex items-center md:order-2 space-x-3 md:space-x-4 rtl:space-x-reverse">
+
+					<span id="themeIconContainer"
+                          class="dark:bg-gray inline-block p-2 rounded  cursor-pointer">
+						<i id="themeIcon" class="fas fa-moon text-gray-300 dark:text-gray-500"></i>
+					</span>
+
+                    <div class="dark:border-gray-800 relative hidden md:block">
+                        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer text-gray-500">
+                            <svg class="w-4 h-4 text bg-navbar text-gray-400" aria-hidden="true"
+                                 xmlns="http://www.w3.org/2000/svg"
+                                 fill="none" viewBox="0 0 20 20">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                      stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
+                            </svg>
+                            <span class="sr-only">Search icon</span>
+                        </div>
+                        <input type="text" id="search-navbar"
+                               class="border-gray-300 dark:border-gray-700 block w-full p-2 pl-10 text-sm text-gray-400 border rounded-lg bg-transparent focus:ring-blue-500 focus:border-blue-500 dark:focus:border-blue-700 placeholder-gray-400 dark:placeholder-gray-500">
+                    </div>
+
+                    <button type="button"
+                            class="flex text-sm rounded-full md:me-0 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600 dropdown-toggle"
+                            id="user-menu-button" aria-expanded="false" data-dropdown-toggle="user-dropdown"
+                            data-dropdown-placement="bottom">
+                        <span class="sr-only">Open user menu</span>
+                        {% if user.is_authenticated %}
+                            <img class="w-12 h-12 rounded-full" src="{{ user.get_image }}"
+                                 alt="Profile Picture">
+                        {% else %}
+                            <img class="w-12 h-12 rounded-full" src="{% static 'img/usuario_anonimo.png' %}"
+                                 alt="Anonymous Profile Picture">
+                        {% endif %}
+                    </button>
+
+                    <div class="dark:bg-secundario rounded-2xl bg-white z-50 hidden my-4 list-none divide-y divide-gray-200 shadow"
+                         id="user-dropdown">
+                        {% if user.is_authenticated %}
+                            <div class="px-4 py-3">
+                                <span class="block font-extrabold text-gray-500 truncate dark:text-gray-400">{{ user.username }}</span>
+                                <span class="block font-extrabold text-gray-500 truncate dark:text-gray-400">{{ user.email }}</span>
+                            </div>
+                            <ul class="dark:bg-secundario py-2" aria-labelledby="user-menu-button">
+                                {% for group in group_list %}
+                                    <li>
+                                        <a href="/modulos/?gpid={{ group.id }}" onclick="closeDropdown()"
+                                           class="block px-4 py-2 font-bold text-gray-500 truncate dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-600 transition-all">{{ group.name }}</a>
+                                    </li>
+                                {% endfor %}
+
+                            </ul>
+                            <ul class="dark:bg-secundario py-2" aria-labelledby="user-menu-button">
+                            <li>
+                                    <a href="{% url 'security:auth_profile' %}" onclick="closeDropdown()"
+                                       class="block px-4 py-2 font-bold text-gray-500 truncate dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-600 transition-all">Perfil</a>
+                                </li>
+
+                                <li>
+                                    <a href="{% url 'security:auth_change_password' %}" onclick="closeDropdown()"
+                                       class="block px-4 py-2 font-bold text-gray-500 truncate dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-600 transition-all">Formatear
+                                        Contraseña</a>
+                                </li>
+
+                                <li>
+                                    <a class="block px-4 py-2 font-bold text-gray-500 truncate dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-600 transition-all cursor-pointer"
+                                       data-drawer-target="drawer-navigation" data-drawer-show="drawer-navigation"
+                                       aria-controls="drawer-navigation" onclick="closeDropdown()">
+                                        Temas
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a class="block px-4 py-2 font-bold text-gray-500 truncate dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-600 transition-all cursor-pointer"
+                                       data-drawer-target="drawer-left-example" data-drawer-show="drawer-left-example"
+                                       data-drawer-placement="left"
+                                       aria-controls="drawer-left-example" onclick="closeDropdown()">
+                                        Autenticación Biométrica
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a href="{% url 'security:auth_logout' %}" onclick="closeDropdown()"
+                                       class="block px-4 py-2 font-bold text-gray-500 truncate dark:text-gray-400 hover:bg-red-600 hover:text-white dark:hover:bg-red-600 dark:hover:text-white transition-all">Cerrar
+                                        Sesión</a>
+                                </li>
+                            </ul>
+                        {% else %}
+                            <ul class="py-2" aria-labelledby="user-menu-button">
+                                <li>
+                                    <a href="{% url 'security:auth_signup' %}" onclick="closeDropdown()"
+                                       class="block px-4 py-2 font-bold text-gray-500 truncate dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-500 transition-all">Registrarse</a>
+                                </li>
+                                <li>
+                                    <a href="{% url 'security:auth_login' %}" onclick="closeDropdown()"
+                                       class="block px-4 py-2 font-bold text-gray-500 truncate dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-500 transition-all">Iniciar
+                                        Sesión</a>
+                                </li>
+                            </ul>
+                        {% endif %}
+                    </div>
+
+                    <!-- Script para ocultar el menu despues de seleccionar una opción -->
+                    <script>
+                        function closeDropdown() {
+                            document.getElementById('user-dropdown').classList.add('hidden');
+                        }
+                    </script>
+
+                    <!-- Boton para pantallas pequenas -->
+                    <button data-collapse-toggle="navbar-user" type="button"
+                            class="inline-flex items-center p-2 w-10 h-10 justify-center font-bold text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-red-100 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+                            aria-controls="navbar-user" aria-expanded="false">
+                        <span class="sr-only">Open main menu</span>
+                        <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                             viewBox="0 0 17 14">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M1 1h15M1 7h15M1 13h15"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Elementos  -->
+                <div class="items-center justify-between hidden w-full md:flex md:w-auto md:order-1" id="navbar-user">
+                    <ul id="menu"
+                        class="dark:dark:bg-secundario navbar-menu flex flex-col p-4 md:p-0 mt-4 rounded-lg bg-white md:bg-transparent md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 dark:border-gray-700">
+                        <li>
+                            <a href="/"
+                               class="block py-2 px-3 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-gray-900 md:p-0 dark:text-gray-400 md:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"><i
+                                    class="fa-solid fa-house"></i></a>
+                        </li>
+                        {% if user.is_superuser %}
+                            <li>
+                                <a href="{% url 'core:product_list' %}"
+                                   class="block py-2 px-3 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-gray-900 md:p-0 dark:text-gray-400 md:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Productos</a>
+                            </li>
+                            <li>
+                                <a href="{% url 'core:category_list' %}"
+                                   class="block py-2 px-3 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-gray-900 md:p-0 dark:text-gray-400 md:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Categorías</a>
+                            </li>
+                            <li>
+                                <a href="{% url 'core:brand_list' %}"
+                                   class="block py-2 px-3 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-gray-900 md:p-0 dark:text-gray-400 md:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Marcas</a>
+                            </li>
+                            <li>
+                                <a href="{% url 'core:supplier_list' %}"
+                                   class="block py-2 px-3 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-gray-900 md:p-0 dark:text-gray-400 md:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Proveedores</a>
+                            </li>
+                        {% endif %}
+                        {% if user.is_authenticated and not user.is_superuser %}
+                            <li>
+                                <a href="{% url 'security:auth_login' %}"
+                                   class="block py-2 px-3 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-gray-900 md:p-0 dark:text-gray-400 md:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Tienda</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+{% endblock navbar %}
+<!-- Cierre de la navbar -->
+
+
+<!-- Columna a la izquierda con temas -->
+<div id="drawer-navigation"
+     class="fixed top-0 left-0 z-50 h-screen p-6 overflow-y-auto transition-transform -translate-x-full bg-white w-64 dark:bg-gray-800"
+     tabindex="-1" aria-labelledby="drawer-navigation-label">
+    <h5 id="drawer-navigation-label"
+        class="items-center text-center mb-4 text-base font-semibold text-gray-500 dark:text-gray-400">Sección de
+        Temas</h5>
+    <hr class="my-6 border-gray-200 sm:mx-auto dark:border-gray-700 lg:my-8"/>
+    <p class="mb-6 text-sm text-gray-500 dark:text-gray-400">Seleccione el tema que desea aplicar en la aplicación para
+        trabajar cómodamente.</p>
+    <hr class="my-6 border-gray-200 sm:mx-auto dark:border-gray-700 lg:my-8"/>
+    <div class="py-6 overflow-y-auto">
+        <ul class="space-y-4">
+            <li>
+                <a class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group cursor-pointer"
+                   onclick="setTheme('light')">
+                    <div class="rect">
+                        <div class="bg-white"></div>
+                        <div class="bg-blue-700"></div>
+                        <div class="bg-white"></div>
+                        <div class="bg-blue-200"></div>
+                    </div>
+                    <span class="text-sm font-medium">Light</span>
+                </a>
+            </li>
+            <li>
+                <a class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group cursor-pointer"
+                   onclick="setTheme('dark')">
+                    <div class="rect">
+                        <div class="bg-black"></div>
+                        <div class="bg-blue-700"></div>
+                        <div class="bg-black"></div>
+                        <div class="bg-blue-200"></div>
+                    </div>
+                    <span class="text-sm font-medium">Dark</span>
+                </a>
+            </li>
+            <li>
+                <a class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group cursor-pointer"
+                   onclick="setTheme('theme1')">
+                    <div class="rect">
+                        <div class="bg-orange-500"></div>
+                        <div class="bg-orange-700"></div>
+                        <div class="bg-orange-300"></div>
+                        <div class="bg-orange-600"></div>
+                    </div>
+                    <span class="text-sm font-medium">Orange</span>
+                </a>
+            </li>
+            <li>
+                <a class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group cursor-pointer"
+                   onclick="setTheme('theme2')">
+                    <div class="rect">
+                        <div class="bg-blue-500"></div>
+                        <div class="bg-blue-700"></div>
+                        <div class="bg-blue-300"></div>
+                        <div class="bg-blue-600"></div>
+                    </div>
+                    <span class="text-sm font-medium">Blue</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
+<!-- Cierre de la columna a la izquierda con temas -->
+
+
+<!-- Columna a la izquierda con Datos Biométricos -->
+<div id="drawer-left-example"
+     class="fixed top-0 left-0 z-50 h-screen p-4 overflow-y-auto transition-transform -translate-x-full bg-white w-80 dark:bg-gray-800"
+     tabindex="-1" aria-labelledby="drawer-left-label">
+    <h5 id="drawer-left-label"
+        class="items-center text-center mb-4 text-base font-semibold text-gray-500 dark:text-gray-400">Autenticación
+        Biométrica</h5>
+    <hr class="my-6 border-gray-200 sm:mx-auto dark:border-gray-700 lg:my-8"/>
+    <p class="mb-6 text-sm text-gray-500 dark:text-gray-400">Activa el desbloqueo Biometrico en tu aplicación, para
+        iniciar seción con mayor facilidad.</p>
+    <hr class="my-6 border-gray-200 sm:mx-auto dark:border-gray-700 lg:my-8"/>
+    <div class="grid grid-cols-2 gap-4">
+        <a href="#" onclick="DesbloqueoFacial()"
+           class="inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Desbloqueo
+            Facial</a>
+        <a href="#" onclick="DesbloqueoDactilar()"
+           class="inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Desbloqueo
+            Dactilar</a>
+    </div>
+</div>
+
+<script>
+    function DesbloqueoFacial() {
+        Swal.fire({
+            title: 'Una forma práctica para desbloquear la aplicación y verificarse.',
+            html: '° El reconocimiento facial se considera menos seguro que otros tipos de bloqueo porque existe la posibilidad de que alguien que se parece a usted o que usa una imagen de su rostro pudiera desbloquear la aplicación. <br> ° Asegúrese de que su rostro esté claramente visible durante el registro. No use una máscara, anteojos de sol o un sombrero que le cubra el rostro. <br> ° Tenga en cuenta que el reconocimiento facial podría no reconocerlo si se producen cambios notables en su apariencia, como un maquillaje abundante, cambios en el vello facial o anteojos.',
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonText: 'Registrar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                DesbloqueoDactilar();
+            }
+        });
+    }
+
+    function DesbloqueoDactilar() {
+        Swal.fire({
+            title: 'Una forma práctica para desbloquear la aplicación y verificarse.',
+            html: 'ESTAMOS TRABAJANDO PARA IMPLEMENTAR ESTA FUNCIONALIDAD, ¡GRACIAS...!',
+            icon: 'info',
+        });
+    }
+</script>
+
+<!-- Cierre de columna a la izquierda con Datos Biométricos -->
+
+
+<!-- Alertas de éxito -->
+{% block success %}
+    {% if messages %}
+        <div id="notification-container" class="fixed top-0 right-0 m-8 z-50">
+            <div id="alert-border-3"
+                 class="space-x-4 flex items-center p-4 mb-4 text-green-800 border-t-4 border-green-300 bg-green-50 dark:text-green-400 dark:bg-gray-800 dark:border-green-800 notification"
+                 role="alert">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="28" height="28">
+                    <path d="M2 8.99997H5V21H2C1.44772 21 1 20.5523 1 20V9.99997C1 9.44769 1.44772 8.99997 2 8.99997ZM7.29289 7.70708L13.6934 1.30661C13.8693 1.13066 14.1479 1.11087 14.3469 1.26016L15.1995 1.8996C15.6842 2.26312 15.9026 2.88253 15.7531 3.46966L14.5998 7.99997H21C22.1046 7.99997 23 8.8954 23 9.99997V12.1043C23 12.3656 22.9488 12.6243 22.8494 12.8658L19.755 20.3807C19.6007 20.7554 19.2355 21 18.8303 21H8C7.44772 21 7 20.5523 7 20V8.41419C7 8.14897 7.10536 7.89462 7.29289 7.70708Z"></path>
+                </svg>
+                <div class="ms-3">
+                    {% for message in messages %}
+                        <span class="font-bold font-Tiny5">¡Buenas noticicias!</span> {{ message }}<br>
+                    {% endfor %}
+                </div>
+                <button type="button"
+                        class="ms-auto -mx-1.5 -my-1.5 bg-green-50 text-green-500 rounded-lg focus:ring-2 focus:ring-green-400 p-1.5 hover:bg-green-200 inline-flex items-center justify-center h-8 w-8 dark:bg-gray-800 dark:text-green-400 dark:hover:bg-gray-700"
+                        data-dismiss-target="#alert-border-3" aria-label="Close">
+                    <span class="sr-only">Dismiss</span>
+                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                         viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    {% endif %}
+{% endblock success %}
+<!-- Cierre de alertas de exito -->
+
+<!-- Alertas de error -->
+{% block error %}
+    {% if form.errors %}
+        <div id="notification-container" class="fixed top-0 right-0 m-8 z-50">
+            <div id="alert-border-2"
+                 class="space-x-6 flex items-center p-4 mb-4 text-red-800 border-t-4 border-red-300 bg-red-50 dark:text-red-400 dark:bg-gray-800 dark:border-red-800 notification"
+                 role="alert">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="28" height="28">
+                    <path d="M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM11 15V17H13V15H11ZM11 7V13H13V7H11Z"></path>
+                </svg>
+                <div class="ms-3">
+                    {% for field in form %}
+                        {% for error in field.errors %}
+                            <span class="font-bold font-Tiny5">{{ field.label }}: </span>{{ error }}<br>
+                        {% endfor %}
+                    {% endfor %}
+                    {% for error in form.non_field_errors %}
+                        {{ error }}<br>
+                    {% endfor %}
+                </div>
+                <button type="button"
+                        class="ms-auto -mx-1.5 -my-1.5 bg-red-50 text-red-500 rounded-lg focus:ring-2 focus:ring-red-400 p-1.5 hover:bg-red-200 inline-flex items-center justify-center h-8 w-8 dark:bg-gray-800 dark:text-red-400 dark:hover:bg-gray-700"
+                        data-dismiss-target="#alert-border-2" aria-label="Close">
+                    <span class="sr-only">Dismiss</span>
+                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                         viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    {% endif %}
+{% endblock error %}
+<!-- Cierre de alertas de error -->
+
+<!-- Contenido -->
+<section class="">
+    {% block content %}
+    {% endblock content %}
+</section>
+<!-- Cierre del contenido -->
+
+<!-- Contenedor para botones-->
+<div class="fixed bottom-36 right-4 flex flex-col space-y-6 items-center">
+    <!-- Botón para volver al principio de la página -->
+    <div>
+
+        <button id="goTopBtn" title="Ir arriba"
+                class="bg-navbar bg-blue-700 text-white px-4 py-2 rounded-full shadow-md transform translate-y-20 opacity-0 transition-all duration-500 ease-in-out">
+            <i class="fas fa-caret-up"></i>
+        </button>
+    </div>
+
+    <!-- Botón de soporte de WhatsApp -->
+    <div class="whatsapp_chat_support" id="button-w">
+        <div class="wcs_button wcs_button_circle">
+            <span class="fa fa-whatsapp"></span>
+        </div>
+
+        <div class="wcs_popup">
+            <div class="wcs_popup_close">
+                <span class="fa fa-close"></span>
+            </div>
+            <div class="wcs_popup_header">
+                <span class="fa fa-whatsapp"></span>
+                <strong>Servicio al cliente</strong>
+
+                <div class="wcs_popup_header_description">¿Necesidad de ayuda? Chatea con nosotros en Whatsapp</div>
+
+            </div>
+            <div class="wcs_popup_input" data-number="593997932650"
+                 data-availability='{ "monday":"06:00-19:00", "tuesday":"06:00-19:00", "wednesday":"06:00-19:00", "thursday":"06:00-19:00", "friday":"06:00-19:00", "saturday":"06:00-19:00", "sunday":"06:00-19:00" }'>
+                <input type="text" placeholder="Escribir pregunta!"/>
+                <i class="fa fa-play"></i>
+            </div>
+            <div class="wcs_popup_avatar">
+                {% if user.get_profile_picture_url %}
+                    <img class="w-12 h-12 rounded-full" src="{{ user.get_profile_picture_url }}" alt="Profile Picture">
+                {% else %}
+                    <img class="w-12 h-12 rounded-full" src="{% static 'img/default_person.png' %}"
+                         alt="Default Profile Picture">
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Cierre del contenedor para botones -->
+
+<!-- Footer -->
+<footer class="dark:bg-principal w-full mx-auto p-5">
+    <div class="w-full max-w-screen-xl mx-auto p-4 md:py-8">
+        <div class="sm:flex sm:items-center sm:justify-between">
+            <a href="/" class="flex items-center mb-4 sm:mb-0 space-x-3 rtl:space-x-reverse">
+                <img src="{% static 'img/iguana_corporation.png' %}" class="w-12 h-12" alt="Flowbite Logo"/>
+                <span class="self-center whitespace-nowrap dark:text-blue-300 font-extrabold"> Iguanas Corp.</span>
+            </a>
+            <ul
+                    class="flex flex-wrap items-center mb-6 text-sm font-medium text-gray-500 sm:mb-0 dark:text-gray-400">
+                <li>
+                    <a href="#" class="hover:underline me-4 md:me-6">Acerca de</a>
+                </li>
+                <li>
+                    <button data-modal-target="default-modal" data-modal-toggle="default-modal"
+                            class="hover:underline me-4 md:me-6" type="button">
+                        Términos de Servicio
+                    </button>
+                </li>
+                <li>
+                    <a href="#" class="hover:underline me-4 md:me-6">Licencia</a>
+                </li>
+                <li>
+                    <a href="#" class="hover:underline">Contactos</a>
+                </li>
+            </ul>
+        </div>
+        <hr class="my-6 border-gray-200 sm:mx-auto dark:border-gray-700 lg:my-8"/>
+        <span class="block text-gray-500 sm:text-center dark:text-gray-400 font-bold">© 2023 <a href=""
+                                                                                                class="hover:underline">Iguanas Corporation™</a>. Todos los derechos reservados.<br>Diseñado por <a
+                class="text-title text-blue-700 hover:underline" href="https://github.com/Alexis2024" target="_blank">Alex Duran</a> y <a
+                class="text-title text-blue-700 hover:underline" href="https://github.com/JaviOHS" target="_blank">Javier Haro</a>
+			</span>
+    </div>
+</footer>
+<!-- Cierre del footer -->
+
+<!-- Modal de Ternino de servicio -->
+<div id="default-modal" tabindex="-1" aria-hidden="true"
+     class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+    <div class="relative p-4 w-full max-w-2xl max-h-full">
+        <!-- Modal content -->
+        <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+            <!-- Modal header -->
+            <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+                    Terminos de Servicios
+                </h3>
+                <button type="button"
+                        class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+                        data-modal-hide="default-modal">
+                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                         viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                    </svg>
+                    <span class="sr-only">Close modal</span>
+                </button>
+            </div>
+            <!-- Modal body -->
+            <div class="p-4 md:p-5 space-y-4">
+                <p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
+                    Faltando menos de un mes para que la Unión Europea promulgue nuevas leyes de privacidad del
+                    consumidor para sus ciudadanos, empresas de todo el mundo están actualizando sus acuerdos de
+                    términos de servicio para cumplir.
+                </p>
+                <p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
+                    El Reglamento General de Protección de Datos de la Unión Europea (G.D.P.R.) entra en vigor el 25
+                    de mayo y tiene como objetivo garantizar un conjunto común de derechos de datos en la Unión
+                    Europea. Requiere que las organizaciones notifiquen a los usuarios lo antes posible sobre
+                    violaciones de datos de alto riesgo que podrían afectarlos personalmente.
+                </p>
+            </div>
+            <!-- Modal footer -->
+            <div class="flex items-center p-4 md:p-5 border-t border-gray-200 rounded-b dark:border-gray-600">
+                <button data-modal-hide="default-modal" type="button"
+                        class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                    Aceptar
+                </button>
+                <button data-modal-hide="default-modal" type="button"
+                        class="py-2.5 px-5 ms-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">
+                    Denegar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="{% static 'js/sweet_alert.js' %}"></script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"
+        integrity="sha512-A7AYk1fGKX6S2SsHywmPkrnzTZHrgiVT7GcQkLGDe2ev0aWb8zejytzS8wjo7PGEXKqJOrjQ4oORtnimIRZBtw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer">
+</script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- jQuery 1.8+ -->
+<script src="{% static 'plugin/components/jQuery/jquery-1.11.3.min.js' %}"></script>
+<!-- Plugin JS file -->
+<script src="{% static 'plugin/components/moment/moment.min.js' %}"></script>
+<script src="{% static 'plugin/components/moment/moment-timezone-with-data.min.js' %}"></script>
+<script src="{% static 'plugin/whatsapp-chat-support.js' %}"></script>
+
+<!-- Script para hacer que las notificaciones desaparezcan después de 5 segundos -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var notifications = document.querySelectorAll('.notification');
+        notifications.forEach(function (notification) {
+            setTimeout(function () {
+                notification.remove();
+            }, 5000);
+        });
+    });
+</script>
+
+<script>
+    function no_disponible() {
+        Swal.fire({
+            icon: 'info',
+            title: '¡Lo sentimos!',
+            text: 'Este tema aún no está disponible',
+            confirmButtonText: 'Aceptar',
+            confirmButtonColor: '#2563EB',
+        });
+    }
+</script>
+<!-- Para mostrar y ocultar el modal de navbar en pantallas pequenas -->
+<script>
+    const menuButton = document.getElementById('menu-button');
+    const modal = document.getElementById('modal');
+
+    menuButton.addEventListener('click', () => {
+        modal.classList.add('flex');
+        modal.classList.remove('hidden');
+    });
+    window.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+    });
+</script>
+
+<!-- Para que el boton de volver al principio aparezca -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        window.addEventListener('scroll', function () {
+            var goTopBtn = document.getElementById('goTopBtn');
+            if (window.scrollY > 100) {
+                goTopBtn.classList.remove('translate-y-20');
+                goTopBtn.classList.remove('opacity-0');
+                goTopBtn.classList.add('translate-y-0');
+                goTopBtn.classList.add('opacity-100');
+            } else {
+                goTopBtn.classList.add('translate-y-20');
+                goTopBtn.classList.add('opacity-0');
+                goTopBtn.classList.remove('translate-y-0');
+                goTopBtn.classList.remove('opacity-100');
+            }
+        });
+
+        document.getElementById('goTopBtn').addEventListener('click', function () {
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        });
+    });
+</script>
+
+<!-- Para mostrar y ocultar dropdowns -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var menuItems = document.querySelectorAll('.group');
+        menuItems.forEach(function (item) {
+            item.addEventListener('mouseenter', function () {
+                var dropdown = this.querySelector('.absolute');
+                dropdown.classList.remove('hidden');
+            });
+            item.addEventListener('mouseleave', function () {
+                var dropdown = this.querySelector('.absolute');
+                setTimeout(function () {
+                    dropdown.classList.add('hidden');
+                }, 500); // 500 milisegundos de retraso
+            });
+        });
+    });
+</script>
+
+<!-- Dropdowns de perfil -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const profilePicture = document.getElementById('profile-picture');
+        const profileMenu = document.getElementById('profile-menu-items');
+
+        if (profilePicture && profileMenu) {
+            profilePicture.addEventListener('mouseover', () => {
+                profileMenu.classList.remove('hidden');
+            });
+
+            profileMenu.addEventListener('mouseleave', () => {
+                profileMenu.classList.add('hidden');
+            });
+
+            // Opcional: para ocultar el menú si el cursor sale de la imagen y no entra en el menú
+            profilePicture.addEventListener('mouseleave', () => {
+                setTimeout(() => {
+                    if (!profileMenu.matches(':hover')) {
+                        profileMenu.classList.add('hidden');
+                    }
+                }, 200); // Puedes ajustar el tiempo según sea necesario
+            });
+        }
+    });
+</script>
+
+<!-- Iniciar chat de Whatsapp -->
+<script>
+    $('#button-w').whatsappChatSupport({
+        defaultMsg: '',
+    });
+</script>
+
+<!-- Inicializar AOS -->
+<script>
+    AOS.init();
+</script>
+
+<script>
+    window.addEventListener('scroll', function () {
+        var navbar = document.querySelector('header');
+        if (window.scrollY > 0) {
+            navbar.classList.remove('bg-transparent');
+            navbar.classList.add('bg-white', 'shadow-md');
+        } else {
+            navbar.classList.remove('bg-white', 'shadow-md');
+            navbar.classList.add('bg-transparent');
+        }
+    });
+</script>
+
+<!---THEMES MODE-->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const themeToggleBtn = document.getElementById('themeIconContainer');
+        const themeIcon = document.getElementById('themeIcon');
+
+        // Función para cambiar el ícono del tema
+        function toggleThemeIcon() {
+            if (document.documentElement.classList.contains('dark')) {
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            } else {
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+            }
+        }
+
+        // Función para aplicar un tema y actualizar el ícono
+        function setTheme(theme) {
+            document.documentElement.className = theme;
+            localStorage.setItem('theme', theme); // Guarda el tema seleccionado en localStorage para persistencia
+
+            // Mostrar u ocultar la imagen de fondo según el tema seleccionado (si es necesario)
+            const heroSection = document.getElementById('hero-section');
+            if (heroSection) {
+                if (theme === 'theme1') {
+                    heroSection.classList.remove('no-background');
+                } else {
+                    heroSection.classList.add('no-background');
+                }
+            }
+
+            // Cambia el ícono del tema
+            toggleThemeIcon();
+        }
+
+        // Verifica si hay un tema guardado en el almacenamiento local
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        setTheme(savedTheme);
+
+        // Cambiar el ícono del tema al cargar la página
+        toggleThemeIcon();
+
+        // Agrega un listener para el evento 'click' en el botón
+        themeToggleBtn.addEventListener('click', function (event) {
+            event.preventDefault(); // Previene el comportamiento predeterminado del ícono
+            // Cambia entre temas light y dark
+            if (document.documentElement.classList.contains('dark')) {
+                setTheme('light');
+            } else {
+                setTheme('dark');
+            }
+        });
+
+        // Exponer setTheme globalmente para usarlo en el menú de temas
+        window.setTheme = setTheme;
+    });
+</script>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Espera hasta que la página esté completamente cargada
+        window.addEventListener('load', function () {
+            // Ocultar el loader
+            document.getElementById('loader').style.display = 'none';
+
+            // Mostrar el contenido del sitio web
+            document.getElementById('content').classList.remove('hidden');
+        });
+    });
+</script>
+
+</body>
+
+</html>

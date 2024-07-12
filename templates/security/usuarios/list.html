@@ -1,0 +1,127 @@
+{% extends 'components/base.html' %}
+
+{% block content %}
+    {% load static %}
+
+    <title>{% block title %}Listado de Usuarios{% endblock title %}</title>
+
+    <section class="dark:bg-principal mt-5">
+        <div class="text-center" data-aos="fade-up" data-aos-delay="200">
+            <div class="sm:pt-28 lg:pt-24">
+                <div class="flex flex-col items-center justify-center">
+                    <span class="rounded-full bg-indigo-500 px-2 py-1 text-white uppercase text-sm">
+                        Listado de Usuarios
+                    </span>
+                </div>
+                <h1 class="dark:text-white text-4xl text-center mt-6 font-Pacifico">
+                    Usuarios Registrados
+                </h1>
+            </div>
+            <div class="lg:p-4 rounded-3xl" data-aos="fade-up" data-aos-delay="200">
+                <!-- Barra de búsqueda -->
+                <div class="p-4 flex justify-center">
+                    <label for="table-search" class="sr-only">Search</label>
+                    <div class="relative mt-1">
+                        <div class="absolute inset-y-0 rtl:inset-r-0 start-0 flex items-center ps-3 pointer-events-none">
+                            <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
+                            </svg>
+                        </div>
+                        <form method="GET" action="{% url 'core:users_list' %}">
+                            <input type="text" name="q" id="table-search" class="text-center pl-10 shadow-sm bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 pr-12 dark:bg-principal dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light" placeholder="Búsqueda sin límites" value="{{ request.GET.q }}">
+                        </form>
+                    </div>
+                </div>
+                <!-- Tabla de usuarios -->
+                <div class="overflow-x-auto">
+                    <table class="w-full text-center text-lg">
+                        <thead class="uppercase font-Tiny5 bg-gray-50 dark:bg-secundario dark:text-blue-300">
+                            <tr>
+                                <th scope="col" class="px-6 py-3">ID</th>
+                                <th scope="col" class="px-6 py-3">Nombre de Usuario</th>
+                                <th scope="col" class="px-6 py-3">Email</th>
+                                <th scope="col" class="px-6 py-3">Grupos</th>
+                                <th scope="col" class="px-6 py-3">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in users %}
+                                <tr class="dark:text-gray-400 bg-white border-b dark:bg-[#0b1121] dark:border-secundario hover:bg-gray-50 dark:hover:bg-[#121c33]">
+                                    <td class="px-6 py-4">{{ user.id }}</td>
+                                    <td class="px-6 py-4">{{ user.username }}</td>
+                                    <td class="px-6 py-4">{{ user.email }}</td>
+                                    <td class="px-6 py-4">
+                                        {% if user.groups.exists %}
+                                            <ul>
+                                                {% for group in user.groups.all %}
+                                                    <li>{{ group.name }}</li>
+                                                {% endfor %}
+                                            </ul>
+                                        {% else %}
+                                            No pertenece a ningún grupo.
+                                        {% endif %}
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        {% if perms.core.change_user %}
+                                            <a href="{% url 'core:user_groups' user.id %}" class="text-blue-600 dark:text-blue-500">
+                                                <i class="fa-solid fa-gear"></i>
+                                            </a>
+                                        {% endif %}
+                                        {% if perms.core.delete_user %}
+                                            <a href="#" class="text-red-600 dark:text-red-500" onclick="openDeleteModal('{{ user.id }}', '{{ user.username }}')">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Paginación -->
+                <div class="flex justify-center mt-4">
+                    <nav aria-label="Page navigation example">
+                        <ul class="inline-flex -space-x-px">
+                            {% if page_obj.has_previous %}
+                                <li>
+                                    <a href="?page=1" class="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-secundario dark:border-principal dark:text-gray-400 dark:hover:bg-[#121c33] dark:hover:text-white">Anterior</a>
+                                </li>
+                            {% endif %}
+                            {% for num in page_obj.paginator.page_range %}
+                                <li>
+                                    <a href="?page={{ num }}" class="flex items-center justify-center px-3 h-8 leading-tight {% if num == page_obj.number %}text-blue-600 bg-blue-50 border border-gray-300 hover:bg-blue-100 hover:text-blue-700 dark:bg-secundario dark:border-principal dark:text-blue-300{% else %}text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-[#121c33] dark:border-secundario dark:text-gray-400 dark:hover:bg-[#121c33] dark:hover:text-white{% endif %}">
+                                        {{ num }}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                            {% if page_obj.has_next %}
+                                <li>
+                                    <a href="?page={{ page_obj.next_page_number }}" class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-[#121c33] dark:border-secundario dark:text-gray-400 dark:hover:bg-[#121c33] dark:hover:text-white">Siguiente</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+        
+    </section>
+    {% include 'core/delete.html' %}
+    <script>
+        function openDeleteModal(id, name) {
+            const deleteForm = document.getElementById('deleteForm');
+            deleteForm.action = `{% url 'core:user_delete' 0 %}`.replace('0', id);
+            document.getElementById('Description').textContent = `ID: ${id} - ${name}`;
+            document.getElementById('deleteModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('deleteModal').classList.add('hidden');
+        }
+    </script> 
+
+{% endblock %}
+
+
+

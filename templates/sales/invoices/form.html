@@ -1,0 +1,130 @@
+{% extends 'components/base.html' %}
+{% block content %}
+    <title>{% block title %}Registrar Venta{% endblock title %}</title>
+    <section class="dark:bg-principal ">
+        <div class="text-center" data-aos="fade-up" data-aos-delay="200">
+            <div class="sm:pt-28 lg:pt-24">
+                
+                <h1 class="dark:text-white text-4xl text-center mt-6 font-Pacifico">
+                    Registrar Venta
+                </h1>
+            </div>
+            <div class="lg:p-4 rounded-3xl" data-aos="fade-up" data-aos-delay="200">
+                <!-- Formulario de Venta -->
+                <form id="frmSale" method="POST" action="{% url 'sales:sales_create' %}" class="space-y-6">
+                    {% csrf_token %}
+                    {{ form.media }}
+                    <div class="p-4 space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label for="{{ form.customer.id_for_label }}" class="dark:text-blue-300 font-black uppercase text-lg">{{ form.customer.label }}</label>
+                                {{ form.customer }}
+                            </div>
+                            <div>
+                                <label for="{{ form.payment_method.id_for_label }}" class="dark:text-blue-300 font-black uppercase text-lg">{{ form.payment_method.label }}</label>
+                                {{ form.payment_method }}
+                            </div>
+                            <div>
+                                <label for="{{ form.issue_date.id_for_label }}" class="dark:text-blue-300 font-black uppercase text-lg">{{ form.issue_date.label }}</label>
+                                {{ form.issue_date }}
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                           <div>
+                                <label for="{{ form.subtotal.id_for_label }}" class="dark:text-blue-300 font-black uppercase text-lg">{{ form.subtotal.label }}</label>
+                                {{ form.subtotal }}
+                            </div>
+                             <div>
+                                <label for="{{ form.discount.id_for_label }}" class="dark:text-blue-300 font-black uppercase text-lg">{{ form.discount.label }}</label>
+                                {{ form.discount }}
+                            </div>
+                             <div>
+                                <label for="{{ form.iva.id_for_label }}" class="dark:text-blue-300 font-black uppercase text-lg">{{ form.iva.label }}</label>
+                                {{ form.iva }}
+                            </div>
+                             <div>
+                                <label for="{{ form.total.id_for_label }}" class="dark:text-blue-300 font-black uppercase text-lg">{{ form.total.label }}</label>
+                                {{ form.total }}
+                            </div>
+                        </div>
+                       
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                           
+                            <div>
+                                <label for="{{ form.payment.id_for_label }}" class="dark:text-blue-300 font-black uppercase text-lg">{{ form.payment.label }}</label>
+                                {{ form.payment }}
+                            </div>
+                            <div>
+                                <label for="{{ form.change.id_for_label }}" class="dark:text-blue-300 font-black uppercase text-lg">{{ form.change.label }}</label>
+                                {{ form.change }}
+                            </div>
+                            <div>
+                                <label for="{{ form.state.id_for_label }}" class="dark:text-blue-300 font-black uppercase text-lg">{{ form.state.label }}</label>
+                                {{ form.state }}
+                            </div>
+                        </div>
+                      
+                    </div>
+                    <div class="">
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-2">
+                            <div>
+                                <label for="product" class="dark:text-blue-300 font-black uppercase text-lg">Producto</label>
+                               <select name="type_hours" id="product" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-12 dark:bg-principal dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light">
+                                {% for prod in products%}
+                                    <option data-id="{{prod.id}}" data-des="{{prod.description}}" data-price="{{prod.price}}" data-stock="{{prod.stock}}" data-iva="{{prod.iva__value}}" value="{{prod.id}}">{{prod.description}}</option>
+                                {% endfor %}
+                               </select>
+                            </div>
+                            <div>
+                                <label for="price" class="dark:text-blue-300 font-black uppercase text-lg">Precio</label>
+                               <input name="price" id="price" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-12 dark:bg-principal dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light">
+                               
+                            </div>
+                           
+                            <div>
+                                <label for="quantify" class="dark:text-blue-300 font-black uppercase text-lg">Cantidad</label>
+                               <input name="quantify" id="quantify" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-12 dark:bg-principal dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light">
+                            </div>
+                            <div class="m-8">
+                                <button id="btnAdd" type="button" class="py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:bg-blue-700 dark:hover:bg-blue-800 dark:focus:ring-blue-500">
+                                Add Producto
+                                </button>
+                            </div>
+                        </div>
+                                           
+                        <div class="flex justify-end">
+                            <button id="btnSave" type="submit" class="py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:bg-blue-700 dark:hover:bg-blue-800 dark:focus:ring-blue-500">
+                            Registrar Venta
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <!-- Tabla de ventas -->
+                <div class="overflow-x-auto">
+                    <div class="border-b border-blue-400 dark:text-white text-xl text-center font-Pacifico">Detalle de la venta</div>
+                    <table class="w-full text-center text-lg">
+                        <thead class="uppercase font-Tiny5 bg-gray-50 dark:bg-secundario dark:text-blue-300">
+                            <tr>
+                                <th scope="col" class="px-6 py-3">Id</th>
+                                <th scope="col" class="px-6 py-3">Producto</th>
+                                <th scope="col" class="px-6 py-3">Precio</th>
+                                <th scope="col" class="px-6 py-3">Cantidad</th>
+                                <th scope="col" class="px-6 py-3">Iva</th>
+                                <th scope="col" class="px-6 py-3">Subtotal</th>
+                                <th scope="col" class="px-6 py-3">Eliminar</th>
+
+                            </tr>
+                        </thead>
+                        <tbody id="detalle">
+{#                            <tr class="dark:text-gray-400 bg-white border-b dark:bg-[#0b1121] dark:border-secundario hover:bg-gray-50 dark:hover:bg-[#121c33]">#}
+{#                                  #}
+{#                            </tr>#}
+                        </tbody>
+                    </table>
+                </div>
+            {% comment %} fin de tabla de detalle de productos {% endcomment %}
+       </div>
+   </section>
+   {% comment %} <script src="{% static 'js/invoices/sales.js' %}"></script> {% endcomment %}
+{% endblock %}

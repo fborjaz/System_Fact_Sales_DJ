@@ -1,0 +1,147 @@
+{% extends 'components/base.html' %}
+{% load static %}
+<title>{% block title %} {{ title1 }} {% endblock title %}</title>
+{% block content %}
+    <!-- SECCION DE MENU Y MODULOS -->
+     <section class="dark:bg-principal">
+        <div class="p-8" data-aos="fade-up" data-aos-delay="300">
+
+
+            <h1 class="dark:text-white text-4xl text-center mt-16 font-Pacifico">
+                {{title2}}
+            </h1>
+            <p class="dark:text-gray-400  text-center mt-6 text-4xl font-light">
+                Bienvenido <span class="dark:text-white text-4xl text-center mt-6 font-Pacifico"> {{user.username}} </span>
+            </p>
+            {% for menu_wrapper in menu_list %}
+                <div class="w-screen flex border-b-2 border-gray-200 py-4 opacity-90">
+                    <i class="{{menu_wrapper.menu.icon}} text-3xl text-green-500"></i>
+                    <h3 class="dark:text-gray-400 font-bold characteristics-card-title"><a href="">menu {{menu_wrapper.menu.name}}</a></h3>
+                </div>
+                <div class="dark:bg-principal grid sm:grid-cols-2 lg:grid-cols-4 gap-8 m-4 lg:mx-4 lg:p-4 rounded-3xl"
+                data-aos="fade-up" data-aos-delay="300">
+                 {% for group_modulo_permission in menu_wrapper.group_module_permission_list %}
+                    <div
+                        class="characteristics-card bg-white dark:bg-secundario dark:border-none transition duration-500 hover:bg-gradient-to-r hover:from-purple-200 dark:hover:bg-gradient-to-r dark:hover:from-black dark:hover:to-purple-500">
+                        <i class="{{group_modulo_permission.module.icon}} text-3xl text-purple-500"></i>
+                        <h3 class="dark:text-gray-400 font-bold characteristics-card-title"><a href="{{group_modulo_permission.module.url}}">{{group_modulo_permission.module.name}}</a></h3>
+                    </div>
+                {% endfor %}
+                </div>
+            {% endfor %}
+
+        </div>
+    </section>
+    <!-- CIERRE DE SECCION DE MENU Y MODULOS -->
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+    <script src="{% static 'js/sweet_alert.js' %}"></script>
+
+    <!-- Script para el modal -->
+
+   {% comment %} <script>
+        $(document).ready(function () {
+            // Función para ocultar el modal al hacer clic en cualquier botón de ingresar
+            $('#btnCliente, #btnAdministrador, #btnModoInvitado').click(function (e) {
+                e.preventDefault(); // Evita que el enlace se siga
+                $('#modal-home').addClass('hidden'); // Oculta el modal usando Tailwind
+
+                // Comportamiento específico para el botón de "Modo Invitado"
+                if (this.id === 'btnModoInvitado') {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: '<h2 class="dark-title">ADVERTENCIA</h2>',
+                        text: 'Para usar las funciones de nuestra aplicación, debe registrarse en nuestro sistema.',
+                        showCancelButton: true,
+                        confirmButtonText: 'Registrarse',
+                        cancelButtonText: 'Continuar con el modo invitado',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Redirecciona a la página de registro
+                            window.location.href = "{% url 'security:auth_login' %}";
+                        }
+                    });
+                } else {
+                    // Redirecciona a la URL especificada en el enlace
+                    window.location.href = $(this).attr('href');
+                }
+            });
+        });
+    </script>  {% endcomment %}
+    <!-- Script para el carrusel de imágenes -->
+    {% comment %} <script>
+        var imagePaths = [
+            "{% static 'img/home-carausel/carausel-1.jpg' %}",
+            "{% static 'img/home-carausel/carausel-2.jpg' %}",
+            "{% static 'img/home-carausel/carausel-3.jpg' %}",
+            "{% static 'img/home-carausel/carausel-4.jpg' %}",
+            "{% static 'img/home-carausel/carausel-5.jpg' %}",
+            "{% static 'img/home-carausel/carausel-6.jpg' %}",
+            "{% static 'img/home-carausel/carausel-7.jpg' %}",
+            "{% static 'img/home-carausel/carausel-8.jpg' %}",
+        ];
+
+        var carouselInner = document.getElementById('carousel-inner');
+        var currentSlide = 0;
+        var totalSlides = imagePaths.length;
+
+        function showSlide(index) {
+            carouselInner.style.transform = `translateX(-${index * 100}%)`;
+        }
+
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % totalSlides;
+            showSlide(currentSlide);
+        }
+
+        window.onload = function () {
+            imagePaths.forEach((path) => {
+                carouselInner.innerHTML += `<img src="${path}" alt="Carousel Image" class="w-full">`;
+            });
+            setInterval(nextSlide, 5000); // Cambiar a la siguiente imagen cada 5 segundos
+        };
+    </script>  {% endcomment %}
+
+    <!-- Script para enviar correos -->
+  {% comment %} <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var form = document.getElementById('contact-form');
+            form.addEventListener('submit', function (event) {
+                event.preventDefault(); // Prevenir el comportamiento predeterminado del formulario
+
+                var formData = new FormData(form);
+
+                fetch(form.action, {
+                    method: form.method,
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                }).then(response => {
+                    if (response.ok) {
+                        document.getElementById('success-message').classList.remove('hidden');
+                        form.reset(); // Resetear el formulario
+
+                        // Ocultar el mensaje de éxito después de 5 segundos
+                        setTimeout(() => {
+                            document.getElementById('success-message').classList.add('hidden');
+                        }, 5000);
+                    } else {
+                        response.json().then(data => {
+                            if (Object.hasOwn(data, 'errors')) {
+                                alert(data["errors"].map(error => error["message"]).join(", "));
+                            } else {
+                                alert('Oops! Hubo un problema al enviar tu formulario');
+                            }
+                        });
+                    }
+                }).catch(error => {
+                    alert('Oops! Hubo un problema al enviar tu formulario');
+                });
+            });
+        });
+    </script>  {% endcomment %}
+{% endblock content %}

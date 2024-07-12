@@ -1,0 +1,20 @@
+# Entorno virtual
+.venv/
+
+# Archivos y directorios Python
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+
+# Archivos de configuración de IDEs
+.vscode/
+.idea/
+
+# Archivos y directorios de logs
+*.log
+logs/
+
+# Archivos y directorios de migraciones
+*/migrations/
+*/migrations/__pycache__/
