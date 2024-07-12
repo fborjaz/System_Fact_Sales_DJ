@@ -1,5 +1,6 @@
 from django import forms
 from app.core.models import Product, Brand, Supplier, Category
+from app.core.models import Company
 from django.utils import timezone
 import datetime
 from django.contrib.auth.forms import UserChangeForm, UserCreationForm
@@ -131,7 +132,6 @@ class CustomPasswordChangeForm(PasswordChangeForm):
     label="Confirma la nueva contraseña"
   )
 
-#
 # class ProductForm(forms.ModelForm):
 #   class Meta:
 #     model = Product

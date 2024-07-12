@@ -39,7 +39,7 @@ class CustomerForm(ModelForm):
             "email",
             "image",
             "active"
-        ]  # Incluimos todos los campos del modelo
+        ]
         error_messages = {
             "dni": {
                 "unique": "Ya existe un cliente con este DNI.",
@@ -121,16 +121,101 @@ class CustomerForm(ModelForm):
         return name.upper()
 
 
-
 class PaymentMethodForm(ModelForm):
     class Meta:
         model = PaymentMethod
         fields = '__all__'
 
 class CompanyForm(ModelForm):
+    image = forms.ImageField(
+        required=False,
+        label="Foto del Empresa",
+        widget=FileInput(attrs={
+            "class": "shadow-sm bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full dark:bg-principal dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light",
+        })
+    )
+
     class Meta:
         model = Company
-        fields = '__all__'
+        fields = [
+            "dni",
+            "name",
+            "address",
+            "representative",
+            "landline",
+            "website",
+            "email",
+            "image",
+            "establishment_code",
+            "emission_point_code",
+            "authorization_number",
+            "taxpayer_type",
+            "required_to_keep_accounting"
+        ]  
+        widgets = {
+            "dni": forms.TextInput(attrs={
+                "placeholder": "Ingrese el RUC de la empresa",
+                "class": "shadow-sm bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-12 dark:bg-principal dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light",
+            }),
+            "name": forms.TextInput(attrs={
+                "placeholder": "Ingrese el nombre de la empresa",
+                "class": "shadow-sm bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-12 dark:bg-principal dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light",
+            }),
+            "address": forms.TextInput(attrs={
+                "placeholder": "Ingrese la dirección de la empresa",
+                "class": "shadow-sm bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-12 dark:bg-principal dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light",
+            }),
+            "representative": forms.TextInput(attrs={
+                "placeholder": "Ingrese el nombre del representante",
+                "class": "shadow-sm bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-12 dark:bg-principal dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light",
+            }),
+            "landline": forms.TextInput(attrs={
+                "placeholder": "Ingrese el teléfono fijo",
+                "class": "shadow-sm bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-12 dark:bg-principal dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light",
+            }),
+            "website": forms.TextInput(attrs={
+                "placeholder": "Ingrese el sitio web",
+                "class": "shadow-sm bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-12 dark:bg-principal dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light",
+            }),
+            "email": forms.EmailInput(attrs={
+                "placeholder": "Ingrese el correo electrónico",
+                "class": "shadow-sm bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-12 dark:bg-principal dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light",
+            }),
+            "establishment_code": forms.TextInput(attrs={
+                "placeholder": "Ingrese el código de establecimiento",
+                "class": "shadow-sm bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-12 dark:bg-principal dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light",
+            }),
+            "emission_point_code": forms.TextInput(attrs={
+                "placeholder": "Ingrese el código de punto de emisión",
+                "class": "shadow-sm bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-12 dark:bg-principal dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light",
+            }),
+            "authorization_number": forms.TextInput(attrs={
+                "placeholder": "Ingrese el número de autorización",
+                "class": "shadow-sm bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-12 dark:bg-principal dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light",
+            }),
+            "taxpayer_type": forms.Select(attrs={
+                "class": "shadow-sm bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-12 dark:bg-principal dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light",
+            }),
+            "required_to_keep_accounting": forms.CheckboxInput(attrs={
+                "class": "mt-1 block px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            })
+        }
+        labels = {
+            "dni": "RUC",
+            "name": "Nombre de la Empresa",
+            "address": "Dirección",
+            "representative": "Representante Legal",
+            "landline": "Teléfono Fijo",
+            "website": "Sitio Web",
+            "email": "Correo Electrónico",
+            "image": "Imagen de la empresa",
+            "establishment_code": "Código de Establecimiento",
+            "emission_point_code": "Código de Punto de Emisión",
+            "authorization_number": "Número de Autorización",
+            "taxpayer_type": "Tipo de Contribuyente",
+            "required_to_keep_accounting": "Obligado a Llevar Contabilidad",
+        }
+
 
 class SupplierForm(ModelForm):
   image = forms.ImageField(required=False, label="Foto del Proveedor", widget=FileInput(attrs={
