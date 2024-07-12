@@ -54,9 +54,9 @@
                                     {{ form.description }}
                                 </div>
                                 <div class="mb-8">
-                                    <label for="{{ form.brands.id_for_label }}"
+                                    <label for="{{ form.brand.id_for_label }}"
                                            class="dark:text-blue-300 font-black uppercase text-lg">{{ form.brand.label }}</label>
-                                    {{ form.brands }}
+                                    {{ form.brand }}
                                 </div>
                                 <div class="mb-8">
                                     <label for="{{ form.supplier.id_for_label }}"
@@ -97,13 +97,13 @@
                                            class="dark:text-blue-300 font-black uppercase text-lg">{{ form.stock.label }}</label>
                                     {{ form.stock }}
                                 </div>
-
-                                <div class="mb-8">
-                                    <label for="{{ form.categories.id_for_label }}"
-                                           class="dark:text-blue-300 font-black uppercase text-lg">{{ form.categories.label }}</label>
-                                    {{ form.category }}
-                                </div>
-
+                                {% if form.categories %}
+                                    <div class="mb-8">
+                                        <label for="{{ form.categories.id_for_label }}"
+                                               class="dark:text-blue-300 font-black uppercase text-lg">{{ form.categories.label }}</label>
+                                        {{ form.categories }}
+                                    </div>
+                                {% endif %}
 
                             </div>
                         </div>

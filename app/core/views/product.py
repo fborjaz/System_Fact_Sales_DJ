@@ -14,7 +14,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 class ProductListView(PermissionMixin, ListViewMixin, ListView):
   model = Product
   template_name = 'core/products/list.html'
-  context_object_name = 'products'
+  context_object_name = 'IC - Products'
   permission_required = 'view_product'
   paginate_by = 4
 
@@ -47,7 +47,7 @@ class ProductListView(PermissionMixin, ListViewMixin, ListView):
       products = paginator.page(paginator.num_pages)
 
     context['brands'] = products
-    context['title1'] = 'Productos'
+    context['title1'] = 'IC - Productos'
     context['title2'] = 'Consulta de Productos'
     context['create_url'] = reverse_lazy('core:product_create')
     context['query'] = self.request.GET.get('q', '')
@@ -63,7 +63,7 @@ class ProductCreateView(PermissionMixin, CreateViewMixin, CreateView):
 
   def get_context_data(self, **kwargs):
     context = super().get_context_data(**kwargs)
-    context['title1'] = 'Crear Producto'
+    context['title1'] = 'IC - Crear Producto'
     context['title2'] = 'Producto'
     context['back_url'] = self.success_url
     return context
@@ -84,7 +84,7 @@ class ProductUpdateView(PermissionMixin, UpdateViewMixin, UpdateView):
 
   def get_context_data(self, **kwargs):
     context = super().get_context_data(**kwargs)
-    context['title1'] = 'Actualizar Producto'
+    context['title1'] = 'IC - Actualizar Producto'
     context['title2'] = 'Actualizar Datos Del Producto'
     context['back_url'] = self.success_url
     return context
@@ -108,7 +108,7 @@ class ProductUpdateView(PermissionMixin, UpdateViewMixin, UpdateView):
 #
 #   def get_context_data(self, **kwargs):
 #     context = super().get_context_data(**kwargs)
-#     context['title'] = 'Eliminar Producto'
+#     context['title'] = 'IC - Eliminar Producto'
 #     context['description'] = f"¿Desea eliminar el producto: {self.object.description}?"
 #     context['back_url'] = self.success_url
 #     return context
@@ -132,7 +132,7 @@ class ProductDeleteView(PermissionMixin, DeleteViewMixin, DeleteView):
 
     def get_context_data(self, **kwargs):
       context = super().get_context_data(**kwargs)
-      context['title'] = 'Eliminar Producto'
+      context['title'] = 'IC - Eliminar Producto'
       context['description'] = f"¿Desea eliminar el producto: {self.object.description}?"
       context['back_url'] = self.success_url
       return context
