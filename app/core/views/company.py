@@ -8,6 +8,8 @@ from django.views.generic import CreateView, ListView, UpdateView, DeleteView
 from django.contrib import messages
 from django.db.models import Q
 
+# PAGINATION
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 class CompanyListView(ListViewMixin, ListView):
     template_name = 'core/company/list.html'
@@ -23,9 +25,24 @@ class CompanyListView(ListViewMixin, ListView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['permission_add'] = context['permissions'].get('add_company', '')
+        queryset = self.get_queryset()
+        paginator = Paginator(queryset, self.paginate_by)
+
+        page = self.request.GET.get('page')
+        try:
+            company = paginator.page(page)
+        except PageNotAnInteger:
+            company = paginator.page(1)
+        except EmptyPage:
+            company = paginator.page(paginator.num_pages)
+
+        context['companys'] = company
+        context['title1'] = 'IC - Compañia'
+        context['title2'] = 'Consulta de Compañias'
         context['create_url'] = reverse_lazy('core:company_create')
+        context['query'] = self.request.GET.get('q', '')
         return context
+
 
 class CompanyCreateView(CreateViewMixin, CreateView):
     model = Company
@@ -35,8 +52,9 @@ class CompanyCreateView(CreateViewMixin, CreateView):
     permission_required = 'add_company'
     
     def get_context_data(self, **kwargs):
-        context =  super().get_context_data(**kwargs)
-        context['grabar'] = 'Grabar Empresa'
+        context = super().get_context_data(**kwargs)
+        context['title1'] = 'IC - Crear Compañia'
+        context['title2'] = 'Compañia'
         context['back_url'] = self.success_url
         return context
     
@@ -49,7 +67,8 @@ class CompanyUpdateView(UpdateViewMixin, UpdateView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['grabar'] = 'Actualizar Empresa'
+        context['title1'] = 'IC - Actualizar Compañia'
+        context['title2'] = 'Compañia'
         context['back_url'] = self.success_url
         return context
     

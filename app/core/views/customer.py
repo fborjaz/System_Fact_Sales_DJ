@@ -67,7 +67,8 @@ class CustomerUpdateView(UpdateViewMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['grabar'] = 'IC - Actualizar Cliente'
+        context['title1'] = 'IC - Actualizar Cliente'
+        context['title2'] = 'Cliente'
         context['back_url'] = self.success_url
         return context
 
