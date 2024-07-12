@@ -7,10 +7,10 @@ from app.security.models import User
 from django.db import models
 from django.forms import ImageField, FileInput
 from django.contrib.auth.forms import PasswordChangeForm
-
+from proy_sales.utils import valida_cedula
 
 class CustomUserCreationForm(UserCreationForm):
-  dni = forms.CharField(max_length=10, label="DNI")
+  dni = forms.CharField(max_length=10, label="DNI", validators=[valida_cedula])
   first_name = forms.CharField(max_length=30, label="Nombres")
   last_name = forms.CharField(max_length=150, label="Apellidos")
   phone = forms.CharField(max_length=10, required=False, label="Celular")
@@ -36,6 +36,12 @@ class CustomUserCreationForm(UserCreationForm):
 
 class CustomUserUpdateForm(forms.ModelForm):
   password = None
+
+  # def clean_dni(self):
+  #   dni = self.cleaned_data['dni']
+  #   if not valida_cedula(dni):
+  #       raise forms.ValidationError("La cédula ingresada no es válida.")
+  #   return dni
 
   image = ImageField(widget=FileInput(attrs={
     "class": "shadow-sm bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full dark:bg-principal dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light",
