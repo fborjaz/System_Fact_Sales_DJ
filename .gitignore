@@ -16,5 +16,9 @@ __pycache__/
 logs/
 
 # Archivos y directorios de migraciones
+*app/core/migrations/
+*app/purcharse/migrations/
+*app/sales/migrations/
+*app/security/migrations/
 */migrations/
 */migrations/__pycache__/
