@@ -1,4 +1,4 @@
-from django.forms import ModelForm, ImageField, FileInput
+from django.forms import ModelForm, ImageField, FileInput, DecimalField
 from app.core.models import Supplier, Line, Iva, ProductPrice, Customer, PaymentMethod, Company
 from django import forms
 
@@ -8,9 +8,41 @@ class LineForm(ModelForm):
         fields = '__all__' 
 
 class IvaForm(ModelForm):
+    value = DecimalField(
+        label="Porcentaje (%)",
+        max_digits=6,
+        decimal_places=2,
+        widget=forms.NumberInput(attrs={
+            "placeholder": "Ingrese el porcentaje de IVA (ej. 12.00)",
+            "class": "shadow-sm bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-12 dark:bg-principal dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light",
+        })
+    )
+    # image = forms.ImageField(
+    #     required=False,
+    #     label="Imagen (Opcional)",
+    #     widget=FileInput(attrs={
+    #         "class": "shadow-sm bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full dark:bg-principal dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light",
+    #     })
+    # )
+
     class Meta:
         model = Iva
-        fields = '__all__' 
+        fields = ['description', 'value', 'active']
+        widgets = {
+            "description": forms.TextInput(attrs={
+                "placeholder": "Ingrese la descripción del IVA",
+                "class": "shadow-sm bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-12 dark:bg-principal dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light",
+            }),
+            "active": forms.CheckboxInput(attrs={
+                "class": "mt-1 block px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            }),
+        }
+        labels = {
+            "description": "Descripción",
+            "value": "Porcentaje (%)",
+            "active": "Activo",
+            #"image": "Imagen (Opcional)",
+        }
 
 class ProductPriceForm(ModelForm):
     class Meta:

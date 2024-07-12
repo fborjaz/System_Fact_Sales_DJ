@@ -8,6 +8,9 @@ from django.views.generic import CreateView, ListView, UpdateView, DeleteView
 from django.contrib import messages
 from django.db.models import Q
 
+# PAGINATION
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
 # -- IVA CLASS -- #
 class IvaListView(ListViewMixin, ListView):
     template_name = 'core/iva/list.html'
@@ -25,8 +28,22 @@ class IvaListView(ListViewMixin, ListView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['permission_add'] = context['permissions'].get('add_iva', '')
+        queryset = self.get_queryset()
+        paginator = Paginator(queryset, self.paginate_by)
+
+        page = self.request.GET.get('page')
+        try:
+            iva = paginator.page(page)
+        except PageNotAnInteger:
+            iva = paginator.page(1)
+        except EmptyPage:
+            iva = paginator.page(paginator.num_pages)
+
+        context['ivas'] = iva
+        context['title1'] = 'IC - Iva'
+        context['title2'] = 'Consulta de iva'
         context['create_url'] = reverse_lazy('core:iva_create')
+        context['query'] = self.request.GET.get('q', '')
         return context
 
 class IvaCreateView(CreateViewMixin, CreateView):
@@ -35,10 +52,12 @@ class IvaCreateView(CreateViewMixin, CreateView):
     form_class = IvaForm
     success_url = reverse_lazy('core:iva_list')
     permission_required = 'add_iva'
-    print(form_class)
+    #print(form_class)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['grabar'] = 'Grabar Iva'
+        context['title1'] = 'IC - Registrar Iva'
+        context['title2'] = 'Iva'
         context['back_url'] = self.success_url
         return context
 
@@ -51,7 +70,8 @@ class IvaUpdateView(UpdateViewMixin, UpdateView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['grabar'] = 'Actualizar Iva'
+        context['title1'] = 'IC - Actualiza Iva'
+        context['title2'] = 'Iva'
         context['back_url'] = self.success_url
         return context
     

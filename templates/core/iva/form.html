@@ -21,7 +21,7 @@
         <form method="post" enctype="multipart/form-data" class="space-y-6 py-4">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mx-4 lg:mx-20" data-aos="fade">
                 <!-- Columna de la izquierda -->
-                <div class="bg-white dark:bg-secundario rounded-3xl flex flex-col justify-center items-center p-8"
+                {% comment %} <div class="bg-white dark:bg-secundario rounded-3xl flex flex-col justify-center items-center p-8"
                     data-aos="fade-right" data-aos-delay="200">
                     <div class="w-[60%] text-center">
                         <h2 class="dark:text-blue-300 text-2xl text-center mt-6 font-Pacifico">Imagen de la categoria
@@ -41,12 +41,12 @@
                             class="dark:text-blue-300 font-black uppercase text-lg">{{ form.image.label }}</label>
                         {{ form.image }}
                     </div>
-                </div>
+                </div> {% endcomment %}
                 <!-- Columna de la derecha -->
                 <div class="p-4 rounded-3xl dark:bg-secundario bg-white flex flex-col justify-center items-center"
                     data-aos="fade-right" data-aos-delay="200">
                     {% csrf_token %}
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-1 gap-6">
                         <div>
                             <div class="mb-8 flex flex-col justify-center items-center">
                                 <label for="{{ form.description.id_for_label }}"

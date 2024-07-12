@@ -149,7 +149,6 @@ class Category(models.Model):
 class Iva(models.Model):
   description = models.CharField(verbose_name='Iva', max_length=100, unique=True)
   value = models.DecimalField(verbose_name='Porcentaje(%)', max_digits=6, decimal_places=2)
-  image = models.ImageField(verbose_name='Imagen', upload_to='ivas/', blank=True, null=True)
   active = models.BooleanField(verbose_name='Activo', default=True)
 
   class Meta:
