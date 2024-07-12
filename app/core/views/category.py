@@ -14,7 +14,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 class CategoryListView(PermissionMixin, ListViewMixin, ListView):
   model = Category
   template_name = 'core/categories/list.html'
-  context_object_name = 'Category'
+  context_object_name = 'IC - Category'
   permission_required = 'view_category'
   paginate_by = 4
 
@@ -41,7 +41,7 @@ class CategoryListView(PermissionMixin, ListViewMixin, ListView):
       categories = paginator.page(paginator.num_pages)
 
     context['categories'] = categories
-    context['title1'] = 'Categorias'
+    context['title1'] = 'IC - Categorias'
     context['title2'] = 'Consulta de Categorias'
     context['create_url'] = reverse_lazy('core:category_create')
     context['query'] = self.request.GET.get('q', '')
@@ -57,7 +57,7 @@ class CategoryCreateView(PermissionMixin, CreateViewMixin, CreateView):
 
   def get_context_data(self, **kwargs):
     context = super().get_context_data(**kwargs)
-    context['title1'] = 'Crear Categoria'
+    context['title1'] = 'IC - Crear Categoria'
     context['title2'] = 'Categoria'
     context['back_url'] = self.success_url
     return context
@@ -78,7 +78,7 @@ class CategoryUpdateView(PermissionMixin, UpdateViewMixin, UpdateView):
 
   def get_context_data(self, **kwargs):
     context = super().get_context_data(**kwargs)
-    context['title1'] = 'Actualizar Categoría'
+    context['title1'] = 'IC - Actualizar Categoría'
     context['title2'] = 'Actualizar Datos De Categoría'
     context['back_url'] = self.success_url
     return context
@@ -102,7 +102,7 @@ class CategoryDeleteView(PermissionMixin, DeleteViewMixin, DeleteView):
 
   def get_context_data(self, **kwargs):
     context = super().get_context_data(**kwargs)
-    context['title'] = 'Eliminar Marca'
+    context['title'] = 'IC - Eliminar Marca'
     context['description'] = f"¿Desea eliminar la marca: {self.object.description}?"
     context['back_url'] = self.success_url
     return context
