@@ -47,9 +47,9 @@
                                     <h3 class="dark:text-blue-300 font-Pacifico">Creación: <span
                                             class="font-light font-Quicksand dark:text-gray-400">{{ item.created |  date:"Y-m-d     -||-     H:i:s" }}</span>
                                     </h3>
-                                    <h3 class="dark:text-blue-300 font-Pacifico">Última edición: <span
+                                    {% comment %} <h3 class="dark:text-blue-300 font-Pacifico">Última edición: <span
                                             class="font-light font-Quicksand dark:text-gray-400">{{ item.updated |  date:"Y-m-d     -||-     H:i:s" }}</span>
-                                    </h3>
+                                    </h3> {% endcomment %}
                                     <h3 class="dark:text-blue-300 font-Pacifico">
                                         Estado:
                                         {% if item.active %}
@@ -128,7 +128,7 @@
     <script>
         function openDeleteModal(id, description) {
             const deleteForm = document.getElementById('deleteForm');
-            deleteForm.action = `{% url 'core:brand_delete' 0 %}`.replace('0', id);
+            deleteForm.action = `{% url 'core:iva_delete' 0 %}`.replace('0', id);
             document.getElementById('Description').textContent = `ID: ${id} - ${description}`;
             document.getElementById('deleteModal').classList.remove('hidden');
         }
