@@ -46,7 +46,7 @@
                 <div class="p-4 rounded-3xl dark:bg-secundario bg-white flex flex-col justify-center items-center"
                     data-aos="fade-right" data-aos-delay="200">
                     {% csrf_token %}
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-1 gap-6">
                         <div>
                             <div class="mb-8 flex flex-col justify-center items-center">
                                 <label for="{{ form.description.id_for_label }}"
@@ -66,7 +66,7 @@
                             <i class="fa-solid fa-save mr-2"></i>Guardar
                         </button>
                         <a class="bg-red-700 hover:bg-red-800 text-white py-2 px-4 rounded-full flex items-center"
-                            href="{% url 'core:brand_list' %}">
+                            href="{% url 'core:line_list' %}">
                             <i class="fa-solid fa-xmark mr-2"></i>Cancelar
                         </a>
                     </div>

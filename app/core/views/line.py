@@ -8,6 +8,9 @@ from django.views.generic import CreateView, ListView, UpdateView, DeleteView
 from django.contrib import messages
 from django.db.models import Q
 
+# PAGINATION
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
 # -- LINE CLASS --#
 class LineListView(ListViewMixin, ListView):
     template_name = 'core/lines/list.html'
@@ -25,9 +28,24 @@ class LineListView(ListViewMixin, ListView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['permission_add'] = context['permissions'].get('add_line', '')
+        queryset = self.get_queryset()
+        paginator = Paginator(queryset, self.paginate_by)
+
+        page = self.request.GET.get('page')
+        try:
+            line = paginator.page(page)
+        except PageNotAnInteger:
+            line = paginator.page(1)
+        except EmptyPage:
+            line = paginator.page(paginator.num_pages)
+
+        context['lines'] = line
+        context['title1'] = 'IC - Lineas'
+        context['title2'] = 'Consulta de lineas'
         context['create_url'] = reverse_lazy('core:line_create')
+        context['query'] = self.request.GET.get('q', '')
         return context
+
     
 
 class LineCreateView(CreateViewMixin, CreateView):
@@ -36,10 +54,12 @@ class LineCreateView(CreateViewMixin, CreateView):
     form_class = LineForm
     success_url = reverse_lazy('core:line_list')
     permission_required = 'add_line'
-    print(form_class)
+    #print(form_class)
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['grabar'] = 'Grabar Linea'
+        context['title1'] = 'IC - Registrar una línea'
+        context['title2'] = 'Línea'
         context['back_url'] = self.success_url
         return context
 
@@ -52,7 +72,8 @@ class LineUpdateView(UpdateViewMixin, UpdateView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['grabar'] = 'Actualizar Linea'
+        context['title1'] = 'IC - Actualizar una línea'
+        context['title2'] = 'Línea'
         context['back_url'] = self.success_url
         return context
     
