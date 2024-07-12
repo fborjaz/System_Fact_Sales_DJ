@@ -1,6 +1,8 @@
 {% extends 'components/base.html' %}
+{% load static %}
 {% block content %}
 <title>{% block title %} {{ title1 }} {% endblock title %}</title>
+
 <section class="dark:bg-principal mt-20">
     <div class="text-center" data-aos="fade-up" data-aos-delay="200">
         <div class="sm:pt-28 lg:pt-24">
@@ -16,49 +18,52 @@
                 Gestione sus clientes.
             </p>
         </div>
+
         <div class="m-4 lg:m-8 sm:mx-40 sm:my-2 lg:grid lg:grid-cols-4 gap-8 lg:mx-20 lg:p-4 rounded-3xl" data-aos="fade-up" data-aos-delay="200">
-            {% for customer in clientes %}
-            <div class="mb-4 flex justify-center custom-transform">
-                <div class="dark:bg-secundario relative w-full overflow-hidden rounded-lg border border-gray-100 bg-white shadow-md dark:border-none">
-                    <div class="dark:bg-secundario text-center card card-custom">
-                        {% if customer.image %}
-                        <figure class="px-10 pt-10">
-                            <img src="{{ customer.image.url }}" alt="Customer Image" class="rounded-xl w-full">
-                        </figure>
-                        {% else %}
-                        {% comment %} <figure class="px-10 pt-10">
-                            <img src="{% static 'img/default_supplier.jpg' %}" alt="Default Image" class="rounded-xl w-full">
-                        </figure> {% endcomment %}
-                        {% endif %}
-                        <h1 class="dark:text-blue-400 text-2xl text-center mt-6 font-black uppercase font-Tiny5">
-                            {{ customer.first_name }} {{ customer.last_name }}
-                        </h1>
-                        <div class="dark:bg-contenedores p-4 card-body flex flex-col justify-center items-center">
-                            <h3 class="dark:text-blue-300 font-Pacifico">DNI: <span class="font-light font-Quicksand dark:text-gray-400">{{ customer.dni }}</span></h3>
-                            <h3 class="dark:text-blue-300 font-Pacifico">Correo: <span class="font-light font-Quicksand dark:text-gray-400">{{ customer.email }}</span></h3>
-                            <h3 class="dark:text-blue-300 font-Pacifico">Teléfono: <span class="font-light font-Quicksand dark:text-gray-400">{{ customer.phone }}</span></h3>
-                            <h3 class="dark:text-blue-300 font-Pacifico">Dirección: <span class="font-light font-Quicksand dark:text-gray-400">{{ customer.address }}</span></h3>
-                            <h3 class="dark:text-blue-300 font-Pacifico">Estado:
-                                {% if customer.active %}
-                                <i class="fa-solid fa-check text-green-500"></i>
-                                {% else %}
-                                <i class="fa-solid fa-square-minus text-red-500"></i>
-                                {% endif %}
-                            </h3>
-                        </div>
-                        <div class="dark:bg-contenedores card-footer flex flex-col md:flex-row justify-center items-center">
-                             <a href="{% url 'core:customer_update' customer.id %}" class="bg-blue-700 hover:bg-blue-800 text-white py-2 px-4 rounded-full mr-0 md:mr-2 mb-2 md:mb-0 flex items-center">
-                                <i class="fa-solid fa-gear mr-2"></i> Editar
-                            </a> 
-                            <button class="bg-red-700 hover:bg-red-800 text-white py-2 px-4 rounded-full flex items-center" onclick="openDeleteModal('{{ customer.id }}', '{{ customer.first_name }} {{ customer.last_name }}')">
-                                <i class="fa-solid fa-trash mr-2"></i> Eliminar
-                            </button>
+            {% for customer in customers %}  <div class="mb-4 flex justify-center custom-transform">
+                    <div class="dark:bg-secundario relative w-full overflow-hidden rounded-lg border border-gray-100 bg-white shadow-md dark:border-none">
+                        <div class="dark:bg-secundario text-center card card-custom">
+                            {% if customer.image %}
+                                <figure class="px-10 pt-10">
+                                    <img src="{{ customer.image.url }}" alt="Customer Image" class="rounded-xl w-full">
+                                </figure>   
+                            {% else %}
+                                <figure class="px-10 pt-10">
+                                    <img src="{% static 'img/default_person.png' %}" alt="Default Image" class="rounded-xl w-full">
+                                </figure> 
+                            {% endif %}
+                            
+                            <h1 class="dark:text-blue-400 text-2xl text-center mt-6 font-black uppercase font-Tiny5">
+                                {{ customer.get_full_name }}  
+                            </h1>
+                            <div class="dark:bg-contenedores p-4 card-body flex flex-col justify-center items-center">
+                                <h3 class="dark:text-blue-300 font-Pacifico">DNI: <span class="font-light font-Quicksand dark:text-gray-400">{{ customer.dni }}</span></h3>
+                                <h3 class="dark:text-blue-300 font-Pacifico">Correo: <span class="font-light font-Quicksand dark:text-gray-400">{{ customer.email }}</span></h3>
+                                <h3 class="dark:text-blue-300 font-Pacifico">Teléfono: <span class="font-light font-Quicksand dark:text-gray-400">{{ customer.phone }}</span></h3>
+                                <h3 class="dark:text-blue-300 font-Pacifico">Dirección: <span class="font-light font-Quicksand dark:text-gray-400">{{ customer.address }}</span></h3>
+                                <h3 class="dark:text-blue-300 font-Pacifico">Estado:
+                                    {% if customer.active %}
+                                        <i class="fa-solid fa-check text-green-500"></i>
+                                    {% else %}
+                                        <i class="fa-solid fa-square-minus text-red-500"></i>
+                                    {% endif %}
+                                </h3>
+                            </div>
+
+                            <div class="dark:bg-contenedores card-footer flex flex-col md:flex-row justify-center items-center">
+                                <a href="{% url 'core:customer_update' customer.id %}" class="bg-blue-700 hover:bg-blue-800 text-white py-2 px-4 rounded-full mr-0 md:mr-2 mb-2 md:mb-0 flex items-center">
+                                    <i class="fa-solid fa-gear mr-2"></i> Editar
+                                </a>
+                                <button class="bg-red-700 hover:bg-red-800 text-white py-2 px-4 rounded-full flex items-center" onclick="openDeleteModal('{{ customer.id }}', '{{ customer.get_full_name }}')">
+                                    <i class="fa-solid fa-trash mr-2"></i> Eliminar
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
             {% endfor %}
         </div>
+
         <div class="flex flex-col md:flex-row justify-center form-group text-center p-4">
             <a class="bg-blue-700 hover:bg-blue-800 text-white py-2 px-4 rounded-full mr-0 md:mr-2 mb-2 md:mb-0 flex items-center justify-center" href="{% url 'core:customer_create' %}">
                 <i class="fa-solid fa-plus mr-2"></i> Nuevo Cliente
@@ -71,7 +76,7 @@
 </section>
 
 {% include 'core/delete.html' %}
- <script>
+<script>
     function openDeleteModal(id, name) {
         const deleteForm = document.getElementById('deleteForm');
         deleteForm.action = `{% url 'core:customer_delete' 0 %}`.replace('0', id);

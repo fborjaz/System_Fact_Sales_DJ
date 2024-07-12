@@ -24,11 +24,9 @@ class ProductListView(PermissionMixin, ListViewMixin, ListView):
 
     if q:
       try:
-        # Intenta buscar por ID primero
         product_id = int(q)
         queryset = queryset.filter(id=product_id)
       except ValueError:
-        # Si no es un número, busca por descripción
         queryset = queryset.filter(description__icontains=q)
 
     return queryset

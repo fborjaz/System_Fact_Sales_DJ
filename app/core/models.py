@@ -305,7 +305,7 @@ class Customer(models.Model):
 
   @property
   def get_full_name(self):
-    return f"{self.last_name} {self.first_name}"
+    return f"{self.first_name} {self.last_name}" 
 
   def delete(self, *args, **kwargs):
     self.active = False

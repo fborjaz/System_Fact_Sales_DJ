@@ -18,9 +18,109 @@ class ProductPriceForm(ModelForm):
         fields = '__all__' 
 
 class CustomerForm(ModelForm):
+    image = forms.ImageField(
+        required=False,
+        label="Foto del Cliente",
+        widget=FileInput(attrs={
+            "class": "shadow-sm bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full dark:bg-principal dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light",
+        })
+    )
+
     class Meta:
         model = Customer
-        fields = '__all__' 
+        fields = [
+            "dni", 
+            "first_name", 
+            "last_name", 
+            "address",
+            "gender",
+            "date_of_birth",
+            "phone", 
+            "email",
+            "image",
+            "active"
+        ]  # Incluimos todos los campos del modelo
+        error_messages = {
+            "dni": {
+                "unique": "Ya existe un cliente con este DNI.",
+            },
+        }
+        widgets = {
+            "dni": forms.TextInput(
+                attrs={
+                    "placeholder": "Ingrese DNI del cliente",
+                    "id": "id_dni",
+                    "class": "shadow-sm bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-12 dark:bg-principal dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light",
+                }
+            ),
+            "first_name": forms.TextInput(
+                attrs={
+                    "placeholder": "Ingrese nombre del cliente",
+                    "id": "id_name",
+                    "class": "shadow-sm bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-12 dark:bg-principal dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light",
+                }
+            ),
+            "last_name": forms.TextInput(
+                attrs={
+                    "placeholder": "Ingrese apellido del cliente",
+                    "id": "id_last_name",
+                    "class": "shadow-sm bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-12 dark:bg-principal dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light",
+                }
+            ),
+            "address": forms.TextInput(
+                attrs={
+                    "placeholder": "Ingrese dirección del cliente",
+                    "class": "shadow-sm bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-12 dark:bg-principal dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light",
+                }
+            ),
+            "gender": forms.Select(
+                attrs={
+                    "class": "shadow-sm bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-12 dark:bg-principal dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light",
+                }
+            ),
+            "date_of_birth": forms.DateInput(
+                attrs={
+                    "type": "date",  # Especificamos que es un campo de fecha
+                    "class": "shadow-sm bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-12 dark:bg-principal dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light",
+                }
+            ),
+            "phone": forms.TextInput(
+                attrs={
+                    "placeholder": "Ingrese número celular",
+                    "id": "id_phone",
+                    "class": "shadow-sm bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-12 dark:bg-principal dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light",
+                }
+            ),
+            "email": forms.EmailInput(
+                attrs={
+                    "placeholder": "Ingrese correo electrónico",
+                    "class": "shadow-sm bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-12 dark:bg-principal dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light",
+                }
+            ),
+            "active": forms.CheckboxInput(
+                attrs={
+                    "class": "mt-1 block px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                }
+            ),
+        }
+        labels = {
+            "dni": "DNI",
+            "first_name": "Nombres",
+            "last_name": "Apellidos",
+            "address": "Dirección",
+            "gender": "Género",
+            "date_of_birth": "Fecha de Nacimiento",
+            "phone": "Celular",
+            "email": "Correo Electrónico",
+            "image": "Imagen del Cliente",
+            "active": "Activo",
+        }
+
+    def clean_name(self):
+        name = self.cleaned_data.get("name")
+        return name.upper()
+
+
 
 class PaymentMethodForm(ModelForm):
     class Meta:
