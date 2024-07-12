@@ -37,7 +37,7 @@
                                     <img id="imagenSeleccionada" src="{{ form.image.value.url }}"
                                          class="mx-auto d-block rounded-lg" alt="Imagen de Proveedor">
                                 {% else %}
-                                    <img id="imagenSeleccionada" src="{% static 'img/incognito.png' %}"
+                                    <img id="imagenSeleccionada" src="{% static 'img/default_brands.png' %}"
                                          class="mx-auto d-block rounded-lg" alt="Imagen de Proveedor por defecto">
                                 {% endif %}
                             </div>
@@ -101,7 +101,7 @@
                 '{% if form.image.value %}'
                     imagenSeleccionada.src = "{{ form.image.value.url }}";
                     '{% else %}'
-                    imagenSeleccionada.src = "{% static 'img/incognito.png' %}";
+                    imagenSeleccionada.src = "{% static 'img/default_brands.png' %}";
                     '{% endif %}'
             }
         });
