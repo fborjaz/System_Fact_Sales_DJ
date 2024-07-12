@@ -12,7 +12,7 @@ import os
 
 
 class Company(models.Model):
-  dni = models.CharField(verbose_name='RUC', max_length=13, blank=True, null=True)
+  dni = models.CharField(verbose_name='RUC', max_length=13, blank=True, null=True, validators=[valida_cedula])
   name = models.CharField(verbose_name='Empresa', max_length=50)
   address = models.CharField(verbose_name='Dirección', max_length=200, blank=True, null=True)
   representative = models.CharField(verbose_name='Responsable', max_length=50, blank=True, null=True)
@@ -92,8 +92,6 @@ class Supplier(models.Model):
   image = models.ImageField(verbose_name='Imagen', upload_to='suppliers/', blank=True, null=True)
   phone = models.CharField(verbose_name='Telefono', max_length=10, validators=[phone_regex])
   address = models.CharField(verbose_name='Direccion', max_length=200)
-  latitude = models.CharField(verbose_name='Latitud', max_length=100)
-  longitude = models.CharField(verbose_name='Longitud', max_length=100)
   active = models.BooleanField(verbose_name='Activo', default=True)
 
   class Meta:
@@ -280,7 +278,7 @@ class ProductPriceDetail(models.Model):
 
 
 class Customer(models.Model):
-  dni = models.CharField(verbose_name='Dni', max_length=13, unique=True, blank=True, null=True)
+  dni = models.CharField(verbose_name='Dni', max_length=13, unique=True, blank=True, null=True, validators=[valida_cedula])
   first_name = models.CharField(verbose_name='Nombres', max_length=50)
   last_name = models.CharField(verbose_name='Apellidos', max_length=50)
   address = models.TextField(verbose_name='Dirección', blank=True, null=True)
@@ -289,8 +287,6 @@ class Customer(models.Model):
   date_of_birth = models.DateField(verbose_name='Fecha Nacimiento', blank=True, null=True)
   phone = models.CharField(verbose_name='Telefono', max_length=50, blank=True, null=True)
   email = models.CharField(verbose_name='Correo', max_length=100, blank=True, null=True)
-  latitude = models.CharField(verbose_name='Latitud', max_length=100)
-  longitude = models.CharField(verbose_name='Longitud', max_length=100)
   image = models.ImageField(verbose_name='Foto', upload_to='customers/', blank=True, null=True)
   active = models.BooleanField(verbose_name='Activo', default=True)
 

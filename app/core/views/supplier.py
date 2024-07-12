@@ -55,7 +55,7 @@ class SupplierCreateView(PermissionMixin, CreateViewMixin, CreateView):
 
   def get_context_data(self, **kwargs):
     context = super().get_context_data()
-    context['title1'] = 'Crear Proveedor'
+    context['title1'] = 'IC - Crear Proveedor'
     context['title2'] = 'Proveedor'
     context['back_url'] = self.success_url
     return context
@@ -76,7 +76,7 @@ class SupplierUpdateView(PermissionMixin, UpdateViewMixin, UpdateView):
 
   def get_context_data(self, **kwargs):
     context = super().get_context_data()
-    context['title1'] = 'Actualizar Proveedor '
+    context['title1'] = 'IC - Actualizar Proveedor '
     context['title2'] = 'Actualizar Datos del Proveedor '
     context['back_url'] = self.success_url
     return context
@@ -100,7 +100,7 @@ class SupplierDeleteView(PermissionMixin, DeleteViewMixin, DeleteView):
 
   def get_context_data(self, **kwargs):
     context = super().get_context_data(**kwargs)
-    context['grabar'] = 'Eliminar Proveedor'
+    context['grabar'] = 'IC - Eliminar Proveedor'
     context['description'] = f"¿Desea eliminar al proveedor: {self.object.name}?"
     context['back_url'] = self.success_url
     return context
