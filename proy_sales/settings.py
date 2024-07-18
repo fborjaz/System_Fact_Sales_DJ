@@ -2,8 +2,6 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 
-ALLOWED_HOSTS = ['127.0.0.0', 'localhost']
-
 # Cargar las variables de entorno desde el archivo .env
 load_dotenv()
 
@@ -57,6 +55,7 @@ MIDDLEWARE = [
     'crum.CurrentRequestUserMiddleware',
     #'livereload.middleware.LiveReloadScript',
 ]
+
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Usar base de datos para sesiones
 SESSION_COOKIE_NAME = 'sessionid'
 SESSION_COOKIE_SECURE = False  # Cambia a True en producción
@@ -88,12 +87,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'proy_sales.wsgi.application'
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'DATA_BASE.sqlite',
-#     }
-# }
 
 DATABASES = {
     "default": {
@@ -139,16 +132,6 @@ AUTH_USER_MODEL = 'security.User'
 LOGIN_URL = '/security/auth/login'
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 
-# Configuración de correo electrónico
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 25
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = os.getenv('ghasquio@gmail.com')
-EMAIL_HOST_PASSWORD = os.getenv('VEne29961221..')
 
-
-print("Cargando variables de entorno...")
-load_dotenv()
 
 
