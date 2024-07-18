@@ -42,7 +42,7 @@ class UserGroupView(View):
         form = UserGroupForm(request.POST, instance=user)
         if form.is_valid():
             form.save()
-            return redirect('core:users_list')  # Cambia 'core:users_list' por tu URL de lista de usuarios
+            return redirect('core:users_list')
         return render(request, 'security/usuarios/form.html', {'form': form, 'title': 'Asignar/Quitar Grupos'})
 
 

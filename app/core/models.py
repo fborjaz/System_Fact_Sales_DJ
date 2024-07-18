@@ -1,13 +1,16 @@
 import datetime
 from decimal import Decimal
-from django.db import models
-from django.urls import reverse
-from django.db.models import F
-from django.contrib.auth.models import User
-from django.utils import timezone
-from django.contrib.auth.models import AbstractUser
+
 from django.conf import settings
-from proy_sales.utils import phone_regex, valida_cedula, valida_numero_flotante_positivo, valida_numero_entero_positivo
+from django.contrib.auth.models import User
+from django.db import models
+from django.db.models import F
+from django.urls import reverse
+from django.utils import timezone
+
+from proy_sales.utils import (phone_regex, valida_cedula,
+                             valida_numero_flotante_positivo,
+                             valida_numero_entero_positivo)
 import os
 
 
