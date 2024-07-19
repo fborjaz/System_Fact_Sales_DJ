@@ -41,7 +41,9 @@ class SupplierListView(PermissionMixin, ListViewMixin, ListView):
       suppliers = paginator.page(paginator.num_pages)
 
     context['suppliers'] = suppliers
-    context['create_url'] = reverse_lazy('core:supplier_create')
+    context['title1'] = 'IC - Proveedores'
+    context['title2'] = 'Consulta de Proveedores'
+    context['create_url'] = reverse_lazy('core:category_create')
     context['query'] = self.request.GET.get('q', '')
     return context
 
