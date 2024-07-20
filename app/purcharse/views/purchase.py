@@ -19,6 +19,8 @@ from app.purcharse.models import Purchase, PurchaseDetail
 from app.security.mixins.mixins import PermissionMixin, CreateViewMixin, UpdateViewMixin, ListViewMixin
 from proy_sales.utils import custom_serializer, save_audit
 
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
 class PurchaseListView(PermissionMixin, ListViewMixin, ListView):
     template_name = 'purchase/list.html'
     model = Purchase
@@ -35,6 +37,22 @@ class PurchaseListView(PermissionMixin, ListViewMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        queryset = self.get_queryset()
+        paginator = Paginator(queryset, self.paginate_by)
+
+        page = self.request.GET.get('page')
+        try:
+            purchases = paginator.page(page)
+        except PageNotAnInteger:
+            purchases = paginator.page(1)
+        except EmptyPage:
+            purchases = paginator.page(paginator.num_pages)
+
+        context['purchases'] = purchases
+        context['title1'] = 'IC - Compras'
+        context['title2'] = 'Consulta de las Compras'
+        context['create_url'] = reverse_lazy('purcharse:purchase_create')
+        context['query'] = self.request.GET.get('q', '')
         return context
 
 
@@ -49,8 +67,16 @@ class PurchaseCreateView(PermissionMixin, CreateViewMixin, CreateView):
         context = super().get_context_data(**kwargs)
         context['products'] = Product.active_products.values('id', 'description', 'cost', 'stock', 'iva__value')
         context['detail_purchases'] = []
+        context['title1'] = 'IC - Crear Compra'
+        context['title2'] = 'Compras'
         context['save_url'] = reverse_lazy('purcharse:purchase_create')
         return context
+    
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        purchase = self.object
+        messages.success(self.request, f"Éxito al crear al proveedor {purchase.name}.")
+        return response
     
     def post(self, request, *args, **kwargs):
         form = self.get_form()

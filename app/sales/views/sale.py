@@ -42,8 +42,6 @@ class SaleListView(PermissionMixin,ListViewMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # context['permission_add'] = context['permissions'].get('add_supplier','')
-        # context['create_url'] = reverse_lazy('core:supplier_create')
         return context
 
 class SaleCreateView(PermissionMixin,CreateViewMixin, CreateView):
