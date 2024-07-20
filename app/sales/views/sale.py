@@ -1,128 +1,138 @@
+import json
+from django.http import JsonResponse
+from django.db import transaction
 from django.urls import reverse_lazy
-from app.core.forms.supplier import SupplierForm
-from app.core.models import Product
+from app.core.models import Product, Iva
 from app.sales.forms.invoice import InvoiceForm
-from app.sales.models import Invoice
+from app.sales.models import Invoice, InvoiceDetail
 from app.security.instance.menu_module import MenuModule
 from app.security.mixins.mixins import CreateViewMixin, DeleteViewMixin, ListViewMixin, PermissionMixin, UpdateViewMixin
 from django.views.generic import CreateView, ListView, UpdateView, DeleteView
 from django.contrib import messages
-from django.db.models import Q, F
+from django.db.models import Q
+from decimal import Decimal
+
+from proy_sales.utils import custom_serializer, save_audit
 
 
 class SaleListView(PermissionMixin, ListViewMixin, ListView):
-  template_name = 'sales/invoices/list.html'
-  model = Invoice
-  context_object_name = 'invoices'
-  permission_required = 'view_invoice'
+    template_name = 'sales/invoices/list.html'
+    model = Invoice
+    context_object_name = 'invoices'
+    permission_required = 'view_invoice'
 
-  def get_queryset(self):
-    q1 = self.request.GET.get('q')  # ver
-    if q1 is not None:
-      self.query.add(Q(id=q1), Q.OR)
-      self.query.add(Q(customer__first_name__icontains=q1), Q.OR)
-      self.query.add(Q(customer__last_name__icontains=q1), Q.OR)
-    return self.model.objects.filter(self.query).order_by('id')
-
-  def get_context_data(self, **kwargs):
-    context = super().get_context_data(**kwargs)
-    context['permission_add'] = context['permissions'].get('add_supplier', '')
-    context['create_url'] = reverse_lazy('core:supplier_create')
-    return context
+    def get_queryset(self):
+        query = Q()
+        q1 = self.request.GET.get('q')
+        if q1 is not None:
+            query |= Q(id=q1)
+            query |= Q(customer__first_name__icontains=q1)
+            query |= Q(customer__last_name__icontains=q1)
+        return self.model.objects.filter(query).order_by('id')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title1'] = 'IC - Ventas'
+        context['title2'] = 'Consulta de Ventas'
+        context['create_url'] = reverse_lazy('sales:sales_create')
+        context['query'] = self.request.GET.get('q', '')
+        return context
 
 
 class SaleCreateView(PermissionMixin, CreateViewMixin, CreateView):
-  model = Invoice
-  template_name = 'sales/invoices/form.html'
-  form_class = InvoiceForm
-  success_url = reverse_lazy('sales:invoice_list')
-  permission_required = 'add_invoice'  # en PermissionMixn se verfica si un grupo tiene el permiso
+    model = Invoice
+    template_name = 'sales/invoices/form.html'
+    form_class = InvoiceForm
+    success_url = reverse_lazy('sales:invoice_list')
+    permission_required = 'add_invoice'
 
-  def get_context_data(self, **kwargs):
-    context = super().get_context_data()
-    context['products'] = Product.active_products.values('id', 'description', 'price', 'stock', 'iva__value')
-    print(context['products'])
-    # context['grabar'] = 'Grabar Proveedor'
-    # context['back_url'] = self.success_url
-    return context
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        context['products'] = Product.active_products.all()
+        context['iva_percentages'] = Iva.objects.filter(active=True)
+        context['detail_sales'] = []
+        context['save_url'] = reverse_lazy('sales:sales_create')
+        return context
 
-  def form_valid(self, form):
-    response = super().form_valid(form)
-    invoice = self.object
-    messages.success(self.request, f"Éxito al registrar la ventar {invoice.id}.")
-    return response
+    def post(self, request, *args, **kwargs):
+        form = self.get_form()
+        if form.is_valid():
+            try:
+                with transaction.atomic():
+                    invoice_data = form.cleaned_data
+                    invoice_data['state'] = 'F'
+                    sale = Invoice.objects.create(**invoice_data)
+
+                    details = json.loads(request.POST['detail'])
+                    for detail in details:
+                        InvoiceDetail.objects.create(
+                            invoice=sale,
+                            product_id=detail['id'],
+                            quantity=Decimal(detail['quantify']),
+                            price=Decimal(detail['price']),
+                            iva_percentage=sale.iva_percentage,  # Usar el iva_percentage de la factura
+                        )
+                        Product.objects.filter(pk=detail['id']).update(stock=F('stock') - Decimal(detail['quantify']))
+
+                    save_audit(request, sale, "A")
+                    messages.success(self.request, f"Éxito al registrar la venta F#{sale.id}")
+                    return JsonResponse({"msg": "Éxito al registrar la venta Factura"}, status=200)
+            except Exception as ex:
+                messages.error(self.request, f"Error al registrar la venta: {ex}")
+        else:
+            messages.error(self.request, f"Error al grabar la venta!!!: {form.errors}.")
+        return JsonResponse({"msg": form.errors}, status=400)
 
 
 class SaleUpdateView(PermissionMixin, UpdateViewMixin, UpdateView):
-  model = Invoice
-  template_name = 'sales/invoices/form.html'
-  form_class = InvoiceForm
-  success_url = reverse_lazy('sales:invoice_list')
-  permission_required = 'change_invoice'
+    model = Invoice
+    template_name = 'sales/invoices/form.html'
+    form_class = InvoiceForm
+    success_url = reverse_lazy('sales:invoice_list')
+    permission_required = 'change_invoice'
 
-  def get_context_data(self, **kwargs):
-    context = super().get_context_data(**kwargs)
-    context['products'] = Product.active_products.values('id', 'description', 'price', 'stock', 'iva__value')
-    return context
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['products'] = Product.active_products.all()
+        detail_sale = list(InvoiceDetail.objects.filter(invoice_id=self.object.id).values(
+            "id", "product", "product__description", "quantity", "price", "subtotal", "iva", "iva_percentage"
+        ))
+        context['detail_sales'] = json.dumps(detail_sale, default=custom_serializer)
+        context['save_url'] = reverse_lazy('sales:sales_update', kwargs={"pk": self.object.id})
+        context['iva_percentages'] = Iva.objects.filter(active=True)
+        return context
 
-  def form_valid(self, form):
-    response = super().form_valid(form)
-    invoice = self.object
-    messages.success(self.request, f"Éxito al actualizar la venta {invoice.id}.")
-    return response
+    def post(self, request, *args, **kwargs):
+        form = self.get_form()
+        if form.is_valid():
+            try:
+                with transaction.atomic():
+                    sale = self.get_object()
+                    invoice_data = form.cleaned_data
+                    Invoice.objects.filter(pk=sale.pk).update(**invoice_data)
 
+                    # Eliminar detalles existentes y ajustar el stock
+                    for det in sale.detail.all():
+                        det.product.stock += det.quantity
+                        det.product.save()
+                    sale.detail.all().delete()
 
-class SaleDeleteView(PermissionMixin, DeleteViewMixin, DeleteView):
-  model = Invoice
-  template_name = 'sales/invoices/delete.html'
-  success_url = reverse_lazy('sales:invoice_list')
-  permission_required = 'delete_invoice'
+                    details = json.loads(request.POST['detail'])
+                    for detail in details:
+                        InvoiceDetail.objects.create(
+                            invoice=sale,
+                            product_id=detail['id'],
+                            quantity=Decimal(detail['quantify']),
+                            price=Decimal(detail['price']),
+                            iva_percentage=sale.iva_percentage,  # Usar el iva_percentage de la factura
+                        )
+                        Product.objects.filter(pk=detail['id']).update(stock=F('stock') - Decimal(detail['quantify']))
 
-  def delete(self, request, *args, **kwargs):
-    response = super().delete(request, *args, **kwargs)
-    messages.success(request, "Éxito al eliminar la venta.")
-    return response
-
-#
-
-# class SupplierUpdateView(PermissionMixin, UpdateViewMixin, UpdateView):
-#   model = Supplier
-#   template_name = 'core/suppliers/form.html'
-#   form_class = SupplierForm
-#   success_url = reverse_lazy('core:supplier_list')
-#   permission_required = 'change_supplier'
-#
-#   def get_context_data(self, **kwargs):
-#     context = super().get_context_data(**kwargs)
-#     context['grabar'] = 'Actualizar Proveedor'
-#     context['back_url'] = self.success_url
-#     return context
-#
-#   def form_valid(self, form):
-#     response = super().form_valid(form)
-#     supplier = self.object
-#     messages.success(self.request, f"Éxito al actualizar el proveedor {supplier.name}.")
-#     return response
-#
-#
-# class SupplierDeleteView(PermissionMixin, DeleteViewMixin, DeleteView):
-#   model = Supplier
-#   template_name = 'core/delete.html'
-#   success_url = reverse_lazy('core:supplier_list')
-#   permission_required = 'delete_supplier'
-#
-#   def get_context_data(self, **kwargs):
-#     context = super().get_context_data(**kwargs)
-#     context['grabar'] = 'Eliminar Proveedor'
-#     context['description'] = f"¿Desea Eliminar al Proveedor: {self.object.name}?"
-#     context['back_url'] = self.success_url
-#     return context
-#
-#   def delete(self, request, *args, **kwargs):
-#     self.object = self.get_object()
-#     success_message = f"Éxito al eliminar lógicamente al proveedor {self.object.name}."
-#     messages.success(self.request, success_message)
-#     # Cambiar el estado de eliminado lógico
-#     # self.object.deleted = True
-#     # self.object.save()
-#     return super().delete(request, *args, **kwargs)
+                    save_audit(request, sale, "M")
+                    messages.success(self.request, f"Éxito al modificar la venta F#{sale.id}")
+                    return JsonResponse({"msg": "Éxito al modificar la venta Factura"}, status=200)
+            except Exception as ex:
+                messages.error(self.request, f"Error al modificar la venta: {ex}")
+        else:
+            messages.error(self.request, f"Error al actualizar la venta!!!: {form.errors}.")
+        return JsonResponse({"msg": form.errors}, status=400)
