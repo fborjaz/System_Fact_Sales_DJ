@@ -144,28 +144,28 @@ class PurchaseDeleteView(PermissionMixin, View):
     def post(self, request, *args, **kwargs):
         try:
             purchase = Purchase.objects.get(id=self.kwargs.get('pk'))
-            current_time = timezone.now()
-            print(purchase)
-            if not purchase.active:
-                messages.error(self.request, "Error al eliminar la compra")
-                return redirect('purchase:purchase_list') 
-            if purchase.issue_date.date() != current_time.date():
-                messages.error(self.request, "Error al eliminar la compra")
-                return redirect('purcharse:purchase_list') 
+            if not self._can_delete_purchase(purchase):
+                messages.error(self.request, "Error al eliminar la compra. Condiciones no cumplidas.")
+                return redirect('purchase:purchase_list')
             with transaction.atomic():
-                purchase.delete()
-                details = PurchaseDetail.objects.filter(purchase_id=purchase.id)
-                for detail in details:
-                    product = detail.product
-                    product.stock -= detail.quantify
-                    product.save()
-                save_audit(request, purchase, "False")
+                self._revert_stock_and_delete(purchase)
                 messages.success(request, f"Éxito al eliminar la compra N#{purchase.id}")
-                return redirect('purcharse:purchase_list') 
         except Purchase.DoesNotExist:
-            return redirect('purcharse:purchase_list') 
+            messages.error(self.request, "La compra no existe.")
         except Exception as ex:
-            return JsonResponse({"msg": str(ex)}, status=400)
+            messages.error(self.request, f"Error inesperado: {ex}")
+        return redirect('purchase:purchase_list')
+
+    def _can_delete_purchase(self, purchase):
+        current_time = timezone.now()
+        return purchase.active and purchase.issue_date.date() == current_time.date()
+
+    def _revert_stock_and_delete(self, purchase):
+        for detail in purchase.purchasedetail_set.all():
+            detail.product.stock += detail.quantify
+            detail.product.save()
+        purchase.delete()  
+        save_audit(request, purchase, "False")
 
 class PurchaseConsultView(TemplateView):
     template_name = 'purchase/consult.html'
