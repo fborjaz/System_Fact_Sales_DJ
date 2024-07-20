@@ -23,8 +23,6 @@ class Purchase(models.Model):
     def __str__(self):
         return "{} - {:%d-%m-%Y}".format(self.num_document,self.issue_date)
 
-
-
 class PurchaseDetail(models.Model):
     purchase = models.ForeignKey(Purchase, on_delete=models.PROTECT,related_name='purchase_detail',verbose_name='Compra')
     product = models.ForeignKey(Product, on_delete=models.PROTECT,related_name='purchase_products')
