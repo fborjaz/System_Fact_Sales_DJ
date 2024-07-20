@@ -57,5 +57,5 @@ urlpatterns = [
                 path('security/', include('app.security.urls', namespace='security')),
                 path('core/', include('app.core.urls', namespace='core')),
                 path('sales/', include('app.sales.urls', namespace='sales')),
-                # path('purchase/', include('app.purchase.urls')),
+                path('purcharse/', include('app.purcharse.urls', namespace='purcharse')),
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

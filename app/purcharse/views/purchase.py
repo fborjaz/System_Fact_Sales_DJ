@@ -1,5 +1,6 @@
 from io import BytesIO
 import json
+from urllib import request
 from django.http import JsonResponse, HttpResponse
 from django.db import transaction
 from django.urls import reverse_lazy
