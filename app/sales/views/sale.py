@@ -48,16 +48,16 @@ class SaleListView(PermissionMixin,ListViewMixin, ListView):
 
         page = self.request.GET.get('page')
         try:
-            purchases = paginator.page(page)
+            sales = paginator.page(page)
         except PageNotAnInteger:
-            purchases = paginator.page(1)
+            sales = paginator.page(1)
         except EmptyPage:
-            purchases = paginator.page(paginator.num_pages)
+            sales = paginator.page(paginator.num_pages)
 
-        context['purchases'] = purchases
+        context['sales'] = sales
         context['title1'] = 'IC - Ventas'
         context['title2'] = 'Consulta de las Ventas'
-        context['create_url'] = reverse_lazy('purcharse:purchase_create')
+        context['create_url'] = reverse_lazy('sales:sales_create')
         context['query'] = self.request.GET.get('q', '')
         return context
     
