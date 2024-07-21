@@ -2,7 +2,7 @@
 {% block content %}
     {% load static %}
     <title>{% block title %}{{ title1 }}{% endblock title %}</title>
-    <section class="dark:bg-principal mt-20"> 
+    <section class="dark:bg-principal mt-10">
         <div class="text-center mt-10" data-aos="fade-up" data-aos-delay="200">
             <div class="sm:pt-28 lg:pt-24">
                 <div class="flex flex-col items-center justify-center">
@@ -28,7 +28,7 @@
                                     d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
                             </svg>
                         </div>
-                        <form method="GET" action="{% url 'core:supplier_list' %}">
+                        <form method="GET" action="{% url 'purcharse:purchase_list' %}">
                             <input type="text" name="q" id="table-search"
                                 class="text-center pl-10 shadow-sm bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 pr-12 dark:bg-principal dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"
                                 placeholder="Búsqueda sin límites" value="{{ request.GET.q }}">
@@ -36,7 +36,7 @@
                     </div>
                 </div>
                 <!-- Tabla de ventas -->
-                <div class="overflow-x-auto">
+                <div class="overflow-x-auto flex justify-center">
                     <table class="w-full text-center text-lg">
                         <thead class="uppercase font-Tiny5 bg-gray-50 dark:bg-secundario dark:text-blue-300">
                             <tr>
@@ -46,13 +46,12 @@
                                 <th scope="col" class="px-6 py-3">Subtotal</th>
                                 <th scope="col" class="px-6 py-3">Iva</th>
                                 <th scope="col" class="px-6 py-3">Total</th>
-                                <th scope="col" class="px-6 py-3">Activo</th>
+                                <th scope="col" class="px-6 py-3">Estado</th>
                                 <th scope="col" class="px-6 py-3">Acciones</th>
 
                             </tr>
                         </thead>
                         <tbody>
-
                             {% for item in purchases %}
                             <tr class="dark:text-gray-400 bg-white border-b dark:bg-[#0b1121] dark:border-secundario hover:bg-gray-50 dark:hover:bg-[#121c33]">
                                 <td class="px-6 py-4">{{ item.id }}</td>
@@ -61,32 +60,33 @@
                                 <td class="px-6 py-4">{{ item.subtotal }}</td>
                                 <td class="px-6 py-4">{{ item.iva }}</td>
                                 <td class="px-6 py-4">{{ item.total }}</td>
-                                <td class="px-6 py-4">
-                                    {% if item.active %}
-                                    <i class="fa-solid fa-check text-green-500"></i>
-                                    {% else %}
-                                    <i class="fa-solid fas fa-eye-slash text-red-500"></i>
-                                    {% endif %}
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span
+                                        class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
+                                            {% if item.state == 'F' %} bg-green-100 text-green-800
+                                            {% elif item.state == 'A' %} bg-red-100 text-red-800
+                                            {% else %} bg-yellow-100 text-yellow-800
+                                            {% endif %}">
+                                        {{ item.get_state_display }}
+                                    </span>
                                 </td>
-                                <td class="px-6 py-4">
-                                    {% if permissions.change_purchase %}
-                                    
-                                        <a href="{% url 'purcharse:purchase_update' item.id %}"
-                                            class="text-blue-600 dark:text-blue-500">
-                                            <i class="fa-solid fa-gear"></i>
-                                        </a>
-                                    {% endif%}
-                                    {% if permissions.delete_purchase %}
-                                    <a href="#" class="text-red-600 dark:text-red-500" onclick="openDeleteModal('{{ item.id }}', '{{ item.supplier.name }}', 'delete')">
-                                        <i class="fa-solid fa-trash"></i>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <div class="space-x-5">
+                                    {% if not item.state == "A" and permissions.change_invoice %}
+                                    <a href="{% url 'purcharse:purchase_update' pk=item.id %}" class="text-blue-600 hover:text-blue-700 dark:text-blue-500 dark:hover:text-blue-400">
+                                        <i class="fa-solid fa-pen-to-square"></i> Editar
                                     </a>
                                     {% endif %}
-                                    <a class="bg-blue-700 hover:bg-blue-800 text-white py-2 px-4 rounded-full flex items-center justify-center"
-                                    href="{% url 'sales:sales_consult' item.id%}">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                                            <path fill-rule="evenodd" d="M13.414 1.414A2 2 0 0 1 15.828 0H20v4.172a2 2 0 0 1-1.414 1.414L13 3.414A2 2 0 0 0 11.586 2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h6.586a2 2 0 0 0 1.414-.586l6.414-6.414A2 2 0 0 0 20 8.828V2.414a2 2 0 0 0-2.586-2L13.414 1.414zM11 3.414v2.172a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V3.414l6-6 6 6zm4 10h-3v3h-2v-3H7v-2h3V8h2v3h3v2z" clip-rule="evenodd" />
-                                        </svg>
+                                    {% if permissions.delete_invoice %}
+                                        {% if item.issue_date|timesince <= "3 days" and item.state != 'A' %}
+                                        <button onclick="openDeleteModal('{{ item.id }}', '{{ item.customer.get_full_name }}', 'cancel')" class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"><i class="fas fa-times"></i> Anular</button>
+                                        {% endif %}
+                                        <button onclick="openDeleteModal('{{ item.id }}', '{{ item.customer.get_full_name }}', 'delete')" class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"><i class="fa-solid fa-trash"></i> Eliminar</button>
+                                    {% endif %}
+                                    <a href="{% url 'purcharse:purchase_consult' pk=item.id %}" class="text-green-600 hover:text-green-700 dark:text-green-500 dark:hover:text-green-400">
+                                        <i class="fa-solid fa-eye"></i> Ver
                                     </a>
+                                </div>
                                 </td>
                             </tr>
                             {% endfor %}
@@ -145,13 +145,13 @@
             const deleteForm = document.getElementById('deleteForm');
             const modalTitle = document.getElementById('Description');
             const submitButton = deleteForm.querySelector('button[type="submit"]');
-            
+
             if (action === 'cancel') {
-                deleteForm.action = `{% url 'sales:sales_cancel' 0 %}`.replace('0', id);
+                deleteForm.action = `{% url 'purcharse:purchase_cancel' 0 %}`.replace('0', id);
                 modalTitle.textContent = `Anular Carrito ID: ${id} - ${name}`;
                 submitButton.textContent = 'Anular Carrito';
             } else if (action === 'delete') {
-                deleteForm.action = `{% url 'purcharse:purchase_delete' 0 %}`.replace('0', id);
+                deleteForm.action = `{% url 'purchase:purchase_delete' pk=0 %}`.replace('0', id);
                 modalTitle.textContent = `Eliminar Carrito ID: ${id} - ${name}`;
                 submitButton.textContent = 'Eliminar Carrito';
             }

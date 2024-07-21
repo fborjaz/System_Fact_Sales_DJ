@@ -1,6 +1,5 @@
 from io import BytesIO
 import json
-from urllib import request
 from django.http import JsonResponse, HttpResponse
 from django.db import transaction
 from django.urls import reverse_lazy
@@ -10,6 +9,7 @@ from django.contrib import messages
 from django.db.models import Q, F
 from decimal import Decimal
 from datetime import timedelta
+from datetime import date
 from django.shortcuts import redirect, get_object_or_404, render
 from django.template.loader import get_template
 from xhtml2pdf import pisa
@@ -26,11 +26,11 @@ class PurchaseListView(PermissionMixin, ListViewMixin, ListView):
     model = Purchase
     context_object_name = 'purchases'
     permission_required = 'view_purchase'
-    
+
     def get_queryset(self):
-        self.query = Q(active=True)
+        self.query = Q()
         q1 = self.request.GET.get('q')
-        if q1 is not None: 
+        if q1 is not None:
             self.query.add(Q(id=q1), Q.OR)
             self.query.add(Q(supplier__name__icontains=q1), Q.OR)
         return self.model.objects.filter(self.query).order_by('id')
@@ -38,20 +38,21 @@ class PurchaseListView(PermissionMixin, ListViewMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         queryset = self.get_queryset()
+        context['now'] = timezone.now()
         paginator = Paginator(queryset, self.paginate_by)
 
-        page = self.request.GET.get('page')
+        purchase = self.request.GET.get('purchase')
         try:
-            purchases = paginator.page(page)
+            purchaese = paginator.page(purchase)
         except PageNotAnInteger:
-            purchases = paginator.page(1)
+            purchaese = paginator.page(1)
         except EmptyPage:
-            purchases = paginator.page(paginator.num_pages)
+            purchaese = paginator.page(paginator.num_pages)
 
-        context['purchases'] = purchases
+        context['purchases'] = purchaese
         context['title1'] = 'IC - Compras'
         context['title2'] = 'Consulta de las Compras'
-        context['create_url'] = reverse_lazy('purcharse:purchase_create')
+        context['create_url'] = reverse_lazy('purchase:purchase_create')
         context['query'] = self.request.GET.get('q', '')
         return context
 
@@ -65,19 +66,13 @@ class PurchaseCreateView(PermissionMixin, CreateViewMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['products'] = Product.active_products.values('id', 'description', 'cost', 'stock', 'iva__value')
+        context['products'] = Product.active_products.values('id', 'description', 'price', 'stock', 'iva__value')
         context['detail_purchases'] = []
-        context['title1'] = 'IC - Crear Compra'
-        context['title2'] = 'Compras'
+        context['title1'] = 'IC - Compras'
+        context['title2'] = 'Crear una nueva compra'
         context['save_url'] = reverse_lazy('purcharse:purchase_create')
         return context
-    
-    def form_valid(self, form):
-        response = super().form_valid(form)
-        purchase = self.object
-        messages.success(self.request, f"Éxito al crear al proveedor {purchase.name}.")
-        return response
-    
+
     def post(self, request, *args, **kwargs):
         form = self.get_form()
         if not form.is_valid():
@@ -95,11 +90,14 @@ class PurchaseCreateView(PermissionMixin, CreateViewMixin, CreateView):
                 )
                 details = json.loads(request.POST['detail'])
                 for detail in details:
+                    product = Product.objects.get(id=int(detail['id']))
+                    product.stock += Decimal(detail['quantify'])
+                    product.save()
                     PurchaseDetail.objects.create(
                         purchase=purchase,
-                        product_id=int(detail['id']),
+                        product=product,
                         quantify=Decimal(detail['quantify']),
-                        cost=Decimal(detail['cost']),
+                        cost=Decimal(detail['price']),
                         iva=Decimal(detail['iva']),
                         subtotal=Decimal(detail['sub'])
                     )
@@ -108,6 +106,7 @@ class PurchaseCreateView(PermissionMixin, CreateViewMixin, CreateView):
                 return JsonResponse({"msg": "Éxito al registrar la compra"}, status=200)
         except Exception as ex:
             return JsonResponse({"msg": str(ex)}, status=400)
+
 
 class PurchaseUpdateView(PermissionMixin, UpdateViewMixin, UpdateView):
     model = Purchase
@@ -118,14 +117,16 @@ class PurchaseUpdateView(PermissionMixin, UpdateViewMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['products'] = Product.active_products.values('id', 'description', 'cost', 'stock', 'iva__value')
+        context['products'] = Product.active_products.values('id', 'description', 'price', 'stock', 'iva__value')
         detail_purchase = list(PurchaseDetail.objects.filter(purchase_id=self.object.id).values(
             "product", "product__description", "quantify", "cost", "subtotal", "iva"))
         detail_purchase = json.dumps(detail_purchase, default=custom_serializer)
         context['detail_purchases'] = detail_purchase
-        context['save_url'] = reverse_lazy('purchase:purchase_update', kwargs={"pk": self.object.id})
+        context['title1'] = 'IC - Compras'
+        context['title2'] = 'Actualiza tus Compras'
+        context['save_url'] = reverse_lazy('purcharse:purchase_update', kwargs={"pk": self.object.id})
         return context
-    
+
     def post(self, request, *args, **kwargs):
         form = self.get_form()
         if not form.is_valid():
@@ -142,22 +143,27 @@ class PurchaseUpdateView(PermissionMixin, UpdateViewMixin, UpdateView):
                 purchase.iva = Decimal(data['iva'])
                 purchase.total = Decimal(data['total'])
                 purchase.save()
+
+                # Restablecer el stock de productos a su estado anterior
                 detdelete = PurchaseDetail.objects.filter(purchase_id=purchase.id)
                 for det in detdelete:
-                    det.product.stock += int(det.quantify)
+                    det.product.stock -= int(det.quantify)
                     det.product.save()
                 detdelete.delete()
+
                 details = json.loads(request.POST['detail'])
                 for detail in details:
-                    Pur_detail = PurchaseDetail.objects.create(
+                    product = Product.objects.get(id=int(detail['id']))
+                    product.stock += Decimal(detail['quantify'])
+                    product.save()
+                    PurchaseDetail.objects.create(
                         purchase=purchase,
-                        product_id=int(detail['id']),
+                        product=product,
                         quantify=Decimal(detail['quantify']),
-                        cost=Decimal(detail['cost']),
+                        cost=Decimal(detail['price']),
                         iva=Decimal(detail['iva']),
                         subtotal=Decimal(detail['sub'])
-                    ) 
-                    Pur_detail.product.reduce_stock(Decimal(detail['quantify']))
+                    )
                 save_audit(request, purchase, "M")
                 messages.success(self.request, f"Éxito al modificar la compra N#{purchase.id}")
                 return JsonResponse({"msg": "Éxito al modificar la compra"}, status=200)
@@ -165,34 +171,80 @@ class PurchaseUpdateView(PermissionMixin, UpdateViewMixin, UpdateView):
             return JsonResponse({"msg": str(ex)}, status=400)
 
 
-class PurchaseDeleteView(PermissionMixin, View):
+from django.db import IntegrityError
+
+class PurchaseCancelView(PermissionMixin, View):
     permission_required = 'delete_purchase'
-    
+
     def post(self, request, *args, **kwargs):
         try:
             purchase = Purchase.objects.get(id=self.kwargs.get('pk'))
-            if not self._can_delete_purchase(purchase):
-                messages.error(self.request, "Error al eliminar la compra. Condiciones no cumplidas.")
-                return redirect('purchase:purchase_list')
-            with transaction.atomic():
-                self._revert_stock_and_delete(purchase)
-                messages.success(request, f"Éxito al eliminar la compra N#{purchase.id}")
+
+            if purchase.state == 'A':
+                messages.error(self.request, "La compra ya está anulada.")
+                return redirect('purchases:purchase_list')
+
+            current_time = timezone.now()
+            time_difference = current_time - purchase.issue_date
+
+            if time_difference <= timedelta(days=3):
+                with transaction.atomic():
+                    purchase.state = 'A'
+                    purchase.save()
+
+                    details = PurchaseDetail.objects.filter(purchase_id=purchase.id)
+                    for detail in details:
+                        product = detail.product
+                        product.stock += detail.quantity
+                        product.save()
+
+                    save_audit(request, purchase, "A")
+                    messages.success(self.request, f"Éxito al anular la compra C#{purchase.id}")
+            else:
+                messages.error(request, "La compra no puede ser anulada. Han pasado más de 3 días desde su emisión.")
+
         except Purchase.DoesNotExist:
-            messages.error(self.request, "La compra no existe.")
+            messages.error(request, "Compra no encontrada.")
         except Exception as ex:
-            messages.error(self.request, f"Error inesperado: {ex}")
+            messages.error(request, f"Error al anular la compra: {ex}")
+
         return redirect('purchase:purchase_list')
 
-    def _can_delete_purchase(self, purchase):
-        current_time = timezone.now()
-        return purchase.active and purchase.issue_date.date() == current_time.date()
 
-    def _revert_stock_and_delete(self, purchase):
-        for detail in purchase.purchasedetail_set.all():
-            detail.product.stock += detail.quantify
-            detail.product.save()
-        purchase.delete()  
-        save_audit(request, purchase, "False")
+class PurchaseDeleteView(PermissionMixin, View):
+    permission_required = 'delete_purchase'
+
+    def post(self, request, *args, **kwargs):
+        try:
+            purchase = Purchase.objects.get(id=self.kwargs.get('pk'))
+            current_time = timezone.now()
+
+            if not purchase.active:  # Corregido a 'not sale.active'
+                messages.error(self.request, "Error al eliminar la venta. La factura de compra no está activa.")
+                return redirect('purchase:purchase_list')
+
+                if purchase.issue_date.date() == current_time.date():  # Corregido para comparar solo la fecha
+                    with transaction.atomic():
+                        purchase.active = False  # Estado de "Cancelado"
+                        purchase.save()
+
+                        details = InvoiceDetail.objects.filter(invoice_id=purchase.id)
+                        for detail in details:
+                            product = detail.product
+                            product.stock += detail.quantity
+                            product.save()
+
+                        save_audit(request, purchase, "False")
+                        messages.success(request, f"Éxito al eliminar la venta F#{purchase.id}")
+                else:
+                    messages.error(request, "Error al eliminar la venta. Solo se pueden eliminar facturas del día actual.")
+
+        except Invoice.DoesNotExist:
+            messages.error(request, "Factura de compra no encontrada.")  # Mensaje de error más específico
+        except Exception as ex:
+            messages.error(request, f"Error al eliminar la compra: {ex}")  # Mensaje de error más específico
+
+        return redirect('purchase:purchase_list')
 
 class PurchaseConsultView(TemplateView):
     template_name = 'purchase/consult.html'
@@ -202,7 +254,9 @@ class PurchaseConsultView(TemplateView):
         purchase_id = self.kwargs.get('pk')
         purchase = get_object_or_404(Purchase, pk=purchase_id)
         context['purchase'] = purchase
+        context['details'] = purchase.purchase_detail.all()
         return context
+
 
 def generate_purchase_pdf(request, purchase_id):
     purchase = get_object_or_404(Purchase, id=purchase_id)
@@ -212,11 +266,11 @@ def generate_purchase_pdf(request, purchase_id):
     }
     html = template.render(context)
     result = BytesIO()
-    pdf = pisa.pisaDocument(BytesIO(html.encode("UTF-8")), result, encoding='UTF-8')
+    pdf = pisa.pisaDocument(BytesIO(html.encode("UTF-8")), result)
     if not pdf.err:
         response = HttpResponse(result.getvalue(), content_type='application/pdf')
         filename = f"purchase_{purchase_id}.pdf"
-        content = f"inline; filename={filename}"
+        content = f"attachment; filename={filename}"
         response['Content-Disposition'] = content
         return response
     return HttpResponse("Error generando el PDF", status=400)

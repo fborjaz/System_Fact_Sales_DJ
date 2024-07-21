@@ -42,7 +42,7 @@ d.addEventListener('DOMContentLoaded', function (e) {
     }
     iva = iva > 0 ? ((price * quantify) * (iva / 100)).toFixed(2) : "0"
     iva = parseFloat(iva)
-    sub = (price * quantify * iva).toFixed(2)
+    sub = (price * quantify + iva).toFixed(2)
     sub = parseFloat(sub)
     detailSale.push({ id, description, price, quantify, iva, sub })
     present()
@@ -136,7 +136,7 @@ d.addEventListener('DOMContentLoaded', function (e) {
     }
   }
 
-  // // fin de grabar 
+  // // fin de grabar
   // ------------- manejo del DOM -------------
   // ---------- envia los datos de la venta con su detalle al backend por ajax para grabarlo ----------
   $form.addEventListener('submit', async (e) => {
@@ -163,7 +163,7 @@ d.addEventListener('DOMContentLoaded', function (e) {
       calculation(idProd, description, iva, price, quantify)
       // d.getElementById('id_nume_hours').value = ""
     } else {
-      alert(`Cantidad negativa o superior al stock:[${stock}]`) 
+      alert(`cantidad negativa o superior al stock:[${stock}]`)
     }
   });
 
