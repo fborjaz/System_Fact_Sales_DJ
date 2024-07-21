@@ -204,7 +204,8 @@ class CompanyForm(ModelForm):
             "emission_point_code",
             "authorization_number",
             "taxpayer_type",
-            "required_to_keep_accounting"
+            "required_to_keep_accounting",
+            "active"
         ]  
         widgets = {
             "dni": forms.TextInput(attrs={
@@ -252,7 +253,10 @@ class CompanyForm(ModelForm):
             }),
             "required_to_keep_accounting": forms.CheckboxInput(attrs={
                 "class": "mt-1 block px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-            })
+            }),
+            "active": forms.CheckboxInput(attrs={
+                    "class": "mt-1 block px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            }),
         }
         labels = {
             "dni": "RUC",
@@ -268,6 +272,7 @@ class CompanyForm(ModelForm):
             "authorization_number": "Número de Autorización",
             "taxpayer_type": "Tipo de Contribuyente",
             "required_to_keep_accounting": "Obligado a Llevar Contabilidad",
+            "active": "Activo",
         }
 
 

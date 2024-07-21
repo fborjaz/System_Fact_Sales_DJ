@@ -23,6 +23,7 @@ class Company(models.Model):
   website = models.URLField(verbose_name='Sitio Web', max_length=100, blank=True, null=True)
   email = models.EmailField(verbose_name='Correo Electrónico', max_length=100, blank=True, null=True)
   logo = models.ImageField(verbose_name='Logo', upload_to='company/', blank=True, null=True)
+  active = models.BooleanField(verbose_name='Activo', default=True)
   # Campos adicionales para la factura del SRI
   establishment_code = models.CharField(
     verbose_name='Código de Establecimiento', max_length=3, blank=True, null=True, default='001',
@@ -34,7 +35,7 @@ class Company(models.Model):
   )
   authorization_number = models.CharField(
     verbose_name='Número de Autorización', max_length=49, blank=True, null=True,
-    default='12345678901234567890123456789012345678901234567890',
+    default='1234567890123456789012345678901234567890123456789',
     help_text='Número de autorización otorgado por el SRI.'
   )
   taxpayer_type = models.CharField(

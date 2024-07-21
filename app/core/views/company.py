@@ -12,13 +12,13 @@ from django.db.models import Q
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 class CompanyListView(ListViewMixin, ListView):
-    template_name = 'core/company/list.html'
     model = Company
+    template_name = 'core/company/list.html'
     context_object_name = "companies"
     permission_required = "view_company"
     
     def get_queryset(self):
-        q1 = self.request.GET.get("q")
+        q1 = self.request.GET.get('q')
         if q1 is not None:
             self.query.add(Q(name__icontains=q1), Q.OR)
         return self.model.objects.filter(self.query).order_by("id")
