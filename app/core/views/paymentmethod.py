@@ -16,7 +16,7 @@ class PaymentMethodListView(ListViewMixin, ListView):
     permission_required = "view_paymentmethod"
     
     def get_queryset(self):
-        self.query = Q(active=True)
+        self.query = Q()
         q1 = self.request.GET.get('q')
         if q1 is not None:
             self.query.add(Q(name__icontains=q1), Q.OR)
@@ -26,6 +26,8 @@ class PaymentMethodListView(ListViewMixin, ListView):
         context = super().get_context_data(**kwargs)
         context['permission_add'] = context['permissions'].get('add_paymentmethod', '')
         context['create_url'] = reverse_lazy('core:paymentmethod_create')
+        context['title1'] = 'IC - Método de Pago '
+        context['title2'] = 'Consulta de los Método de Pago '
         return context
     
 class PaymentMethodCreateView(CreateViewMixin, CreateView):
