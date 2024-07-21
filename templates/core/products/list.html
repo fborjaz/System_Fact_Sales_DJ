@@ -34,7 +34,7 @@
                         <form method="GET" action="{% url 'core:product_list' %}">
                             <input type="text" name="q" id="table-search"
                                 class="text-center pl-10 shadow-sm bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 pr-12 dark:bg-principal dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"
-                                placeholder="ID o Descripción" value="{{ request.GET.q }}">
+                                placeholder="ID o Producto" value="{{ request.GET.q }}">
                         </form>
                     </div>
                 </div>
@@ -50,10 +50,7 @@
                                 <th scope="col" class="px-6 py-3">Categoría</th>
                                 <th scope="col" class="px-6 py-3">Precio</th>
                                 <th scope="col" class="px-6 py-3">Stock</th>
-<<<<<<< HEAD
-=======
-                                <th scope="col" class="px-6 py-3">Proveedor</th>
->>>>>>> 047eb8b4a00e8d7bcef352a3904a60aa1831304e
+<!--                            <th scope="col" class="px-6 py-3">Proveedor</th>-->
                                 <th scope="col" class="px-6 py-3">Adicional</th>
                                 <th scope="col" class="px-6 py-3">Estado</th>
                                 <th scope="col" class="px-6 py-3">Acciones</th>
@@ -75,10 +72,7 @@
                                 <td class="px-2 py-4 text-green-600 dark:text-green-300 font-black">$ {{ item.price }}
                                 </td>
                                 <td class="px-2 py-4">{{ item.stock }}</td>
-<<<<<<< HEAD
-=======
-                                <td class="px-2 py-4">{{ item.get_suppliers }}</td>
->>>>>>> 047eb8b4a00e8d7bcef352a3904a60aa1831304e
+<!--                                <td class="px-2 py-4">{{ item.get_suppliers }}</td>-->
                                 <td class="px-6 py-4">
                                     <button id="dropdownButton{{ item.id }}" onclick="toggleDropdown('{{ item.id }}')"
                                         class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-principal dark:hover:bg-secundario dark:focus:ring-blue-800"
@@ -92,7 +86,8 @@
                                             aria-labelledby="dropdownButton{{ item.id }}">
                                             <li>
                                                 <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
-                                                    <span class="text-2xl dark:text-green-300 font-Pacifico">{{ item.get_line_display }}<br></span>
+                                                    <span class="dark:text-blue-300 font-Tiny5 uppercase">Linea:<br></span>
+                                                    {{ item.line }}
                                                 </a>
                                             </li>
                                             <li>
@@ -150,25 +145,25 @@
             <div class="flex justify-center mt-4">
                 <nav aria-label="Page navigation example">
                     <ul class="inline-flex -space-x-px">
-                        {% if products.has_previous %}
-                        <li>
-                            <a href="?page={{ products.previous_page_number }}"
-                                class="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-[#0b1121] dark:border-secundario dark:text-gray-400 dark:hover:bg-[#121c33] dark:hover:text-white">Anterior</a>
-                        </li>
+                        {% if page_obj.has_previous %}
+                            <li>
+                                <a href="?page=1"
+                                   class="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-[#0b1121] dark:border-secundario dark:text-gray-400 dark:hover:bg-[#121c33] dark:hover:text-white">Anterior</a>
+                            </li>
                         {% endif %}
-                        {% for num in products.paginator.page_range %}
-                        <li>
-                            <a href="?page={{ num }}"
-                                class="flex items-center justify-center px-3 h-8 leading-tight {% if num == products.number %}text-blue-600 bg-blue-50 border border-gray-300 hover:bg-blue-100 hover:text-blue-700 dark:bg-secundario dark:border-principal dark:text-blue-300{% else %}text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-[#0b1121] dark:border-secundario dark:text-gray-400 dark:hover:bg-[#121c33] dark:hover:text-white{% endif %}">
-                                {{ num }}
-                            </a>
-                        </li>
+                        {% for num in page_obj.paginator.page_range %}
+                            <li>
+                                <a href="?page={{ num }}"
+                                   class="flex items-center justify-center px-3 h-8 leading-tight {% if num == page_obj.number %}text-blue-600 bg-blue-50 border border-gray-300 hover:bg-blue-100 hover:text-blue-700 dark:bg-secundario dark:border-principal dark:text-blue-300{% else %}text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-[#0b1121] dark:border-secundario dark:text-gray-400 dark:hover:bg-[#121c33] dark:hover:text-white{% endif %}">
+                                    {{ num }}
+                                </a>
+                            </li>
                         {% endfor %}
-                        {% if products.has_next %}
-                        <li>
-                            <a href="?page={{ products.next_page_number }}"
-                                class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-[#0b1121] dark:border-secundario dark:text-gray-400 dark:hover:bg-[#121c33] dark:hover:text-white">Siguiente</a>
-                        </li>
+                        {% if page_obj.has_next %}
+                            <li>
+                                <a href="?page={{ page_obj.next_page_number }}"
+                                   class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-[#0b1121] dark:border-secundario dark:text-gray-400 dark:hover:bg-[#121c33] dark:hover:text-white">Siguiente</a>
+                            </li>
                         {% endif %}
                     </ul>
                 </nav>

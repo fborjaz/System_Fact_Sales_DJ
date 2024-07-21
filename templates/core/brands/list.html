@@ -42,8 +42,7 @@
                             <div class="dark:bg-secundario text-center card card-custom">
                                 <figure class="px-10 pt-10">
                                     <img class="mx-auto w-15 h-15 object-contain rounded-2xl"
-                                         src=" 
-                                                 {% if item.image %}{{ item.image.url }}{% else %}{% static 'img/incognito.png' %}{% endif %}"
+                                         src="{% if item.image %}{{ item.image.url }}{% else %}{% static 'img/default_brands.png' %}{% endif %}"
                                          alt="Imagen del proveedor">
                                 </figure>
                                 <h1 class="dark:text-blue-400 text-2xl text-center mt-6 font-black uppercase font-Tiny5">
