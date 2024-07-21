@@ -30,14 +30,18 @@
             <div class="mb-6">
                 <label class="block dark:text-blue-300 text-sm font-bold mb-2">Búsqueda de productos:</label>
                 <div class="flex items-center space-x-2">
-                    <select id="product" name="product" class="flex-grow p-2 border rounded focus:ring-2 focus:ring-blue-500 transition duration-200">
+                    <select id="product" name="product" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-12 dark:bg-principal dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light">
                         {% for prod in products %}
                             <option data-id="{{prod.id}}" data-des="{{prod.description}}" data-price="{{prod.price}}" data-stock="{{prod.stock}}" data-iva="{{prod.iva__value}}" value="{{prod.id}}" {% if forloop.first %}selected{% endif %}>{{prod.description}}</option>
                         {% endfor %}
                     </select>
-                    <input id="price" name="price" type="text" placeholder="Precio" class="w-24 p-2 border rounded focus:ring-2 focus:ring-blue-500 transition duration-200">
-                    <input id="quantify" name="quantify" type="number" placeholder="Cantidad" class="w-24 p-2 border rounded focus:ring-2 focus:ring-blue-500 transition duration-200">
-                    <button id="btnAdd" type="button" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-200 flex items-center">
+                    <div>
+                    <input id="price" name="price" type="text" placeholder="Precio" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-12 dark:bg-principal dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light">
+                    </div>
+                    <div>
+                    <input id="quantify" name="quantify" type="number" placeholder="Cantidad" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-12 dark:bg-principal dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light">
+                    </div>
+                    <button id="btnAdd" type="button" class="bg-blue-700 hover:bg-blue-800 text-white py-2 px-4 rounded-full flex items-center justify-center text-sm transition duration-200">
                         <i class="fas fa-plus mr-2"></i> Agregar
                     </button>
                 </div>
