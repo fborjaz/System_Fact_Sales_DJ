@@ -4,24 +4,26 @@
 {% block content %}
 <title>{% block title %} {{ title1 }} {% endblock title %}</title>
 
-<section class="dark:bg-principal mt-20">
+<section class="dark:bg-principal">
     <div class="text-center" data-aos="fade" data-aos-delay="200">
         <div class="sm:pt-28 lg:pt-24">
-                <div class="flex flex-col items-center justify-center">
+            <div class="flex flex-col items-center justify-center">
                 <span class="rounded-full bg-indigo-500 px-2 py-1 text-white uppercase text-sm">
                     {{ title1 }}
                 </span>
-                </div>
-                <h1 class="dark:text-white text-4xl  text-center mt-6 font-Pacifico">
-                    {{ title2 }}
-                </h1>
+            </div>
+            <h1 class="dark:text-white text-4xl text-center mt-6 font-Pacifico">
+                {{ title2 }}
+            </h1>
         </div>
 
         <p class="text-4xl font-light text-center mt-6 dark:text-gray-400">
             Bienvenido
             <span class="font-Pacifico text-4xl dark:text-white"> {{ user.username }} </span>
         </p>
+    </div>
 
+    <div class="container mx-auto">
         {% for menu_wrapper in menu_list %}
             <div class="w-full flex border-b-2 border-gray-200 py-4 opacity-90">
                 <i class="{{ menu_wrapper.menu.icon }} text-3xl text-green-500"></i>
@@ -29,20 +31,26 @@
                     <a href="">Menú {{ menu_wrapper.menu.name }}</a>
                 </h3>
             </div>
-
-            <div class="grid gap-8 m-4 rounded-3xl dark:bg-principal sm:grid-cols-2 lg:grid-cols-4 lg:mx-4 lg:p-4" data-aos="fade-up" data-aos-delay="300">
+            <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8 mt-4" data-aos="fade-up" data-aos-delay="300">
                 {% for group_modulo_permission in menu_wrapper.group_module_permission_list %}
-                    <div class="characteristics-card max-w-xs bg-white dark:bg-secundario dark:border-none transition duration-500 hover:bg-gradient-to-r hover:from-purple-200 dark:hover:bg-gradient-to-r dark:hover:from-black dark:hover:to-purple-500 overflow-hidden">
-                        <i class="{{ group_modulo_permission.module.icon }} text-3xl text-purple-500"></i>
-                        <h3 class="font-bold characteristics-card-title dark:text-gray-400 truncate">
-                            <a href="{{ group_modulo_permission.module.url }}">{{ group_modulo_permission.module.name }}</a>
-                        </h3>
-                    </div>
+                    <a href="{{ group_modulo_permission.module.url }}" class="group relative p-4 bg-white dark:bg-secundario rounded-lg shadow-md transition duration-300 hover:bg-gradient-to-r hover:from-purple-200 dark:hover:bg-gradient-to-r dark:hover:from-black dark:hover:to-purple-500">
+                        <div class="flex items-center mb-2">
+                            <i class="{{ group_modulo_permission.module.icon }} text-4xl text-purple-500 group-hover:text-white transition duration-300"></i>
+                            <h3 class="ml-2 text-xl font-semibold dark:text-gray-300 group-hover:text-white transition duration-300">{{ group_modulo_permission.module.name }}</h3>
+                        </div>
+                        <p class="text-gray-600 dark:text-gray-400 group-hover:text-white transition duration-300">{{ group_modulo_permission.module.description }}</p>
+                    </a>
                 {% endfor %}
             </div>
         {% endfor %}
-    </div>
+
+    </div> <div class="h-16"></div>
 </section>
+
+<script>
+    // Efecto de scroll con AOS
+    AOS.init();
+</script>
 
     <!-- CIERRE DE SECCION DE MENU Y MODULOS -->
 
@@ -82,38 +90,5 @@
                 }
             });
         });
-    </script>  {% endcomment %}
-    <!-- Script para el carrusel de imágenes -->
-    {% comment %} <script>
-        var imagePaths = [
-            "{% static 'img/home-carausel/carausel-1.jpg' %}",
-            "{% static 'img/home-carausel/carausel-2.jpg' %}",
-            "{% static 'img/home-carausel/carausel-3.jpg' %}",
-            "{% static 'img/home-carausel/carausel-4.jpg' %}",
-            "{% static 'img/home-carausel/carausel-5.jpg' %}",
-            "{% static 'img/home-carausel/carausel-6.jpg' %}",
-            "{% static 'img/home-carausel/carausel-7.jpg' %}",
-            "{% static 'img/home-carausel/carausel-8.jpg' %}",
-        ];
-
-        var carouselInner = document.getElementById('carousel-inner');
-        var currentSlide = 0;
-        var totalSlides = imagePaths.length;
-
-        function showSlide(index) {
-            carouselInner.style.transform = `translateX(-${index * 100}%)`;
-        }
-
-        function nextSlide() {
-            currentSlide = (currentSlide + 1) % totalSlides;
-            showSlide(currentSlide);
-        }
-
-        window.onload = function () {
-            imagePaths.forEach((path) => {
-                carouselInner.innerHTML += `<img src="${path}" alt="Carousel Image" class="w-full">`;
-            });
-            setInterval(nextSlide, 5000); // Cambiar a la siguiente imagen cada 5 segundos
-        };
     </script>  {% endcomment %}
 {% endblock content %}

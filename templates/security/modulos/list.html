@@ -2,7 +2,7 @@
 {% block content %}
     {% load static %}
     <title>{% block title %}{{ title1 }}{% endblock title %}</title>
-    <section class="dark:bg-principal mt-5">
+    <section class="dark:bg-principal">
         <div class="text-center" data-aos="fade-up" data-aos-delay="200">
             <div class="sm:pt-28 lg:pt-24">
                 <div class="flex flex-col items-center justify-center">
@@ -13,29 +13,30 @@
                 <h1 class="dark:text-white text-4xl text-center mt-6 font-Pacifico">
                     {{ title2 }}
                 </h1>
-               
+                <p class="dark:text-gray-400 text-center mt-6 text-lg font-light">
+                Gestione sus Modulos.
+                </p>
             </div>
-            <div class="lg:p-4 rounded-3xl" data-aos="fade-up" data-aos-delay="200">
-                <!-- Barra de búsqueda -->
-                <div class="p-4 flex justify-center">
-                    <label for="table-search" class="sr-only">Search</label>
-                    <div class="relative mt-1">
-                        <div
-                            class="absolute inset-y-0 rtl:inset-r-0 start-0 flex items-center ps-3 pointer-events-none">
-                            <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
-                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
-                            </svg>
-                        </div>
-                        <form method="GET" action="{% url 'core:modules_list' %}">
-                            <input type="text" name="q" id="table-search"
-                                class="text-center pl-10 shadow-sm bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 pr-12 dark:bg-principal dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"
-                                placeholder="Búsqueda sin límites" value="{{ request.GET.q }}">
-                        </form>
+
+            <!-- Barra de búsqueda -->
+            <div class="p-4 flex justify-center">
+                <label for="table-search" class="sr-only">Search</label>
+                <div class="relative mt-1">
+                    <div class="absolute inset-y-0 rtl:inset-r-0 start-0 flex items-center ps-3 pointer-events-none">
+                        <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
+                             xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
+                        </svg>
                     </div>
+                    <form method="GET" action="{% url 'core:modules_list' %}">
+                        <input type="text" name="q" id="table-search"
+                               class="text-center pl-10 shadow-sm bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 pr-12 dark:bg-principal dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"
+                               placeholder="Búsqueda sin límites" value="{{ request.GET.q }}">
+                    </form>
                 </div>
+            </div>
+
                 <!-- Tabla de modulos -->
                 <div class="overflow-x-auto">
                     <table class="w-full text-center text-lg">
