@@ -14,7 +14,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 class ProductListView(PermissionMixin, ListViewMixin, ListView):
   model = Product
   template_name = 'core/products/list.html'
-  context_object_name = 'IC - Products'
+  context_object_name = 'products'
   permission_required = 'view_product'
   paginate_by = 4
 
