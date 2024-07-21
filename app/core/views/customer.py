@@ -1,6 +1,6 @@
 from django.db.models.query import QuerySet
 from django.urls import reverse_lazy
-from app.core.forms.supplier import CustomerForm 
+from app.core.forms.supplier import CustomerForm
 from app.core.models import Customer
 from app.security.instance.menu_module import MenuModule
 from app.security.mixins.mixins import CreateViewMixin, ListViewMixin, PermissionMixin, UpdateViewMixin
@@ -13,16 +13,20 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 # -- CLASS CUSTOMER --#
 class CustomerListView(ListViewMixin, ListView):
-    template_name = 'core/customer/list.html'
     model = Customer
+    template_name = 'core/customer/list.html'
+    context_object_name = 'customers'
     permission_required = "view_customer"
+    paginate_by = 4
 
     def get_queryset(self):
-        self.query = Q(active=True)
         q1 = self.request.GET.get('q')
         if q1 is not None:
-            self.query.add(Q(first_name__icontains=q1) | Q(last_name__icontains=q1), Q.OR)
+            self.query.add(Q(name__icontains=q1), Q.OR)
         return self.model.objects.filter(self.query).order_by("id")
+
+        order_by = self.request.GET.get('o', 'id')
+        return self.model.objects.filter(self.query).order_by(order_by)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -31,13 +35,15 @@ class CustomerListView(ListViewMixin, ListView):
 
         page = self.request.GET.get('page')
         try:
-            customer = paginator.page(page)
+            customers = paginator.page(page)
         except PageNotAnInteger:
-            customer = paginator.page(1)
+            customers = paginator.page(1)
         except EmptyPage:
-            customer = paginator.page(paginator.num_pages)
+            customers = paginator.page(paginator.num_pages)
 
-        context['customers'] = customer
+        context = super().get_context_data(**kwargs)
+        context['permission_add'] = context['permissions'].get('add_customer', '')
+        context['customers'] =  customers
         context['title1'] = 'IC - Clientes'
         context['title2'] = 'Consulta de Clientes'
         context['create_url'] = reverse_lazy('core:customer_create')
@@ -57,6 +63,12 @@ class CustomerCreateView(CreateViewMixin, CreateView):
         context['title2'] = 'Cliente'
         context['back_url'] = self.success_url
         return context
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        customers = self.object
+        messages.success(self.request, f"Éxito al crear el cliente {customers.first_name}.")
+        return response
 
 class CustomerUpdateView(UpdateViewMixin, UpdateView):
     model = Customer
