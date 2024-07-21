@@ -24,6 +24,7 @@ from django.template.loader import get_template
 from xhtml2pdf import pisa
 from io import BytesIO
 
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 class SaleListView(PermissionMixin,ListViewMixin, ListView):
     template_name = 'sales/invoices/list.html'
@@ -42,10 +43,24 @@ class SaleListView(PermissionMixin,ListViewMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # context['permission_add'] = context['permissions'].get('add_supplier','')
-        # context['create_url'] = reverse_lazy('core:supplier_create')
-        return context
+        queryset = self.get_queryset()
+        paginator = Paginator(queryset, self.paginate_by)
 
+        page = self.request.GET.get('page')
+        try:
+            purchases = paginator.page(page)
+        except PageNotAnInteger:
+            purchases = paginator.page(1)
+        except EmptyPage:
+            purchases = paginator.page(paginator.num_pages)
+
+        context['purchases'] = purchases
+        context['title1'] = 'IC - Ventas'
+        context['title2'] = 'Consulta de las Ventas'
+        context['create_url'] = reverse_lazy('purcharse:purchase_create')
+        context['query'] = self.request.GET.get('q', '')
+        return context
+    
 class SaleCreateView(PermissionMixin,CreateViewMixin, CreateView):
     model = Invoice
     template_name = 'sales/invoices/form.html'
@@ -58,7 +73,11 @@ class SaleCreateView(PermissionMixin,CreateViewMixin, CreateView):
         context['products'] = Product.active_products.values('id','description','price','stock','iva__value')
         context['detail_sales'] =[]
         context['save_url'] = reverse_lazy('sales:sales_create') 
-        print(context['products'])
+        context['title1'] = 'IC - Ventas'
+        context['title2'] = 'Crear una Venta'
+        context['create_url'] = reverse_lazy('purcharse:purchase_create')
+        context['query'] = self.request.GET.get('q', '')
+        return context
         
         return context
     
