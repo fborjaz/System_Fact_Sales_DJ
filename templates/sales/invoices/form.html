@@ -1,200 +1,114 @@
 {% extends 'components/base.html' %}
-{% load static %}
-
 {% block content %}
-<title>{% block title %} {{ title1 }} {% endblock title %}</title>
-
-<section class="dark:bg-principal"><br>
-    <div class="text-center" data-aos="fade" data-aos-delay="200">
-        <div class="sm:pt-28 lg:pt-4 mt-10">
-            <div class="flex flex-col items-center justify-center">
-                <span class="rounded-full bg-indigo-500 px-2 py-1 text-white uppercase text-sm">
-                    {{ title1 }}
-                </span>
-            </div>
-            <h1 class="dark:text-white text-4xl text-center mt-6 font-Pacifico">
-                {{ title2 }}
-            </h1>
+{% load static %}
+<title>{% block title %}Registrar Venta{% endblock title %}</title>
+<section class="dark:bg-principal p-8 mt-10">
+    <div class="max-w-7xl mx-auto bg-white dark:bg-secundario shadow-lg rounded-lg overflow-hidden">
+        <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+            <h1 class="dark:text-white text-3xl font-bold">Nuevo registro de una Venta</h1>
         </div>
-
-        <div class="lg:p-4 rounded-3xl" data-aos="fade-up" data-aos-delay="200">
-            <form id="frmSale" method="POST" action="{{ save_url }}" class="space-y-6">
-                {% csrf_token %}
-                {{ form.media }}
-                <div class="p-4 space-y-4">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div>
-                            <label for="{{ form.customer.id_for_label }}" class="dark:text-blue-300 font-black uppercase text-lg">{{ form.customer.label }}</label>
-                            {{ form.customer }}
-                        </div>
-                        <div>
-                            <label for="{{ form.payment_method.id_for_label }}" class="dark:text-blue-300 font-black uppercase text-lg">{{ form.payment_method.label }}</label>
-                            {{ form.payment_method }}
-                        </div>
-                        <div>
-                            <label for="{{ form.issue_date.id_for_label }}" class="dark:text-blue-300 font-black uppercase text-lg">{{ form.issue_date.label }}</label>
-                            {{ form.issue_date }}
-                        </div>
-                    </div>
-                    <div>
-                        <label for="{{ form.iva_percentage.id_for_label }}" class="dark:text-blue-300 font-black uppercase text-lg">{{ form.iva_percentage.label }}</label>
-                        {{ form.iva_percentage }}
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <div>
-                            <label for="{{ form.discount.id_for_label }}" class="dark:text-blue-300 font-black uppercase text-lg">{{ form.discount.label }}</label>
-                            {{ form.discount }}
-                        </div>
-                        <div>
-                            <label for="{{ form.payment.id_for_label }}" class="dark:text-blue-300 font-black uppercase text-lg">{{ form.payment.label }}</label>
-                            {{ form.payment }}
-                        </div>
-                        <div class="col-span-2">
-                            {{ form.subtotal }}
-                            {{ form.iva }}
-                            {{ form.total }}
-                            {{ form.change }}
-                        </div> 
-                    </div> 
-                </div>
-
+        
+        <form id="frmSale" method="POST" class="p-6">
+            {% csrf_token %}
+            {{ form.media }}
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                 <div>
-                    </div>
-            </form>
-        </div>
+                    <label for="{{ form.customer.id_for_label }}" class="block dark:text-blue-300 text-sm font-bold mb-2">{{ form.customer.label }}</label>
+                    {{ form.customer }}
+                </div>
+                <div>
+                    <label for="{{ form.issue_date.id_for_label }}" class="block dark:text-blue-300 text-sm font-bold mb-2">{{ form.issue_date.label }}</label>
+                    {{ form.issue_date }}
+                </div>
+                <div>
+                    <label for="{{ form.payment_method.id_for_label }}" class="block dark:text-blue-300 text-sm font-bold mb-2">{{ form.payment_method.label }}</label>
+                    {{ form.payment_method }}
+                </div>
+            </div>
+            
+            <div class="mb-6">
+                <label class="block dark:text-blue-300 text-sm font-bold mb-2">Búsqueda de productos:</label>
+                <div class="flex items-center space-x-2">
+                    <select id="product" name="product" class="flex-grow p-2 border rounded focus:ring-2 focus:ring-blue-500 transition duration-200">
+                        {% for prod in products %}
+                            <option data-id="{{prod.id}}" data-des="{{prod.description}}" data-price="{{prod.price}}" data-stock="{{prod.stock}}" data-iva="{{prod.iva__value}}" value="{{prod.id}}" {% if forloop.first %}selected{% endif %}>{{prod.description}}</option>
+                        {% endfor %}
+                    </select>
+                    <input id="price" name="price" type="text" placeholder="Precio" class="w-24 p-2 border rounded focus:ring-2 focus:ring-blue-500 transition duration-200">
+                    <input id="quantify" name="quantify" type="number" placeholder="Cantidad" class="w-24 p-2 border rounded focus:ring-2 focus:ring-blue-500 transition duration-200">
+                    <button id="btnAdd" type="button" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-200 flex items-center">
+                        <i class="fas fa-plus mr-2"></i> Agregar
+                    </button>
+                </div>
+            </div>
 
-        <div class="overflow-x-auto">
-            <div class="border-b border-blue-400 dark:text-white text-xl text-center font-Pacifico">Detalle de la venta</div>
-            <table class="w-full text-center text-lg">
-                <thead class="uppercase font-Tiny5 bg-gray-50 dark:bg-secundario dark:text-blue-300">
-                    <tr>
-                        <th scope="col" class="px-6 py-3">Id</th>
-                        <th scope="col" class="px-6 py-3">Producto</th>
-                        <th scope="col" class="px-6 py-3">Precio</th>
-                        <th scope="col" class="px-6 py-3">Cantidad</th>
-                        <th scope="col" class="px-6 py-3">Subtotal</th> 
-                        <th scope="col" class="px-6 py-3">Eliminar</th>
-                    </tr>
-                </thead>
-                <tbody id="detalle">
-                </tbody>
-            </table>
-        </div>
+            <div class="overflow-x-auto mb-6">
+                <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                        <tr>
+                            <th scope="col" class="px-6 py-3">Código</th>
+                            <th scope="col" class="px-6 py-3">Producto</th>
+                            <th scope="col" class="px-6 py-3">Precio</th>
+                            <th scope="col" class="px-6 py-3">Cantidad</th>
+                            <th scope="col" class="px-6 py-3">Iva</th>
+                            <th scope="col" class="px-6 py-3">Total</th>
+                            <th scope="col" class="px-6 py-3">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="detalle" class="divide-y divide-gray-200 dark:divide-gray-700">
+                        <!-- Los detalles de la venta se insertarán aquí dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <div>
+                    <label for="{{ form.subtotal.id_for_label }}" class="block dark:text-blue-300 text-sm font-bold mb-2">{{ form.subtotal.label }}</label>
+                    {{ form.subtotal }}
+                </div>
+                <div>
+                    <label for="{{ form.discount.id_for_label }}" class="block dark:text-blue-300 text-sm font-bold mb-2">{{ form.discount.label }}</label>
+                    {{ form.discount }}
+                </div>
+                <div>
+                    <label for="{{ form.iva.id_for_label }}" class="block dark:text-blue-300 text-sm font-bold mb-2">{{ form.iva.label }}</label>
+                    {{ form.iva }}
+                </div>
+                <div>
+                    <label for="{{ form.total.id_for_label }}" class="block dark:text-blue-300 text-sm font-bold mb-2">{{ form.total.label }}</label>
+                    {{ form.total }}
+                </div>
+                <div>
+                    <label for="{{ form.payment.id_for_label }}" class="dark:text-blue-300 font-black uppercase text-lg">{{ form.payment.label }}</label>
+                    {{ form.payment }} 
+                </div>
+                <div>
+                    <label for="{{ form.change.id_for_label }}" class="dark:text-blue-300 font-black uppercase text-lg">{{ form.change.label }}</label>
+                    {{ form.change }}
+                </div>
+                <div>
+                    <label for="{{ form.state.id_for_label }}" class="dark:text-blue-300 font-black uppercase text-lg">{{ form.state.label }}</label>
+                    {{ form.state }}
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between">
+                <button id="btnSave" type="submit" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded focus:outline-none focus:shadow-outline transition duration-200">
+                    <i class="fas fa-save mr-2"></i> Registrar Venta
+                </button>
+                <a class="bg-blue-700 hover:bg-blue-800 text-white py-2 px-4 rounded-full flex items-center justify-center text-sm transition duration-200"
+                    href="{% url 'sales:sales_list' %}">
+                    <i class="fa-solid fa-house mr-2"></i> Volver al inicio
+                </a>
+            </div>
+        </form>
     </div>
 </section>
 
 <script>
-    const productSelect = document.getElementById('product');
-    const priceInput = document.getElementById('price');
-    const quantityInput = document.getElementById('quantify');
-    const addButton = document.getElementById('btnAdd');
-    const detailTable = document.getElementById('detalle');
-    const discountInput = document.getElementById('id_discount');
-    const paymentInput = document.getElementById('id_payment');
-    const subtotalInput = document.getElementById('id_subtotal');
-    const ivaInput = document.getElementById('id_iva');
-    const totalInput = document.getElementById('id_total');
-    const changeInput = document.getElementById('id_change');
-
-    let details = [];
-    let count = 0; 
-
-    // Función para cargar los detalles iniciales si existen (en caso de edición)
-    function loadInitialDetails(initialDetails) {
-        if (initialDetails) {
-            details = JSON.parse(initialDetails);
-            for (const detail of details) {
-                addDetailRow(detail);
-            }
-            calculateInvoiceTotals();
-        }
-    }
-
-    // Función para agregar una fila a la tabla de detalles
-    function addDetailRow(detail) {
-        const row = detailTable.insertRow();
-        row.id = `row-${count}`;
-
-        row.insertCell().textContent = detail.product;
-        row.insertCell().textContent = detail.product__description;
-        row.insertCell().textContent = parseFloat(detail.price).toFixed(2);
-        row.insertCell().textContent = detail.quantity;
-
-        // Calcula el subtotal y IVA de la línea
-        const subtotal = detail.price * detail.quantity;
-        const ivaValue = detail.iva_percentage.value / 100; // Obtiene el valor del IVA desde el objeto iva_percentage
-        const ivaAmount = subtotal * ivaValue;
-        row.insertCell().textContent = ivaAmount.toFixed(2); 
-        row.insertCell().textContent = subtotal.toFixed(2);
-
-        // Botón de eliminar
-        const deleteCell = row.insertCell();
-        const deleteButton = document.createElement('button');
-        deleteButton.textContent = 'Eliminar';
-        deleteButton.classList.add('text-red-600', 'dark:text-red-500', 'hover:underline'); // Agrega clases de Tailwind CSS
-        deleteButton.onclick = function() {
-            deleteDetailRow(count);
-        };
-        deleteCell.appendChild(deleteButton);
-
-        count++;
-    }
-
-    // Función para eliminar una fila de la tabla de detalles
-    function deleteDetailRow(index) {
-        const row = document.getElementById(`row-${index}`);
-        row.remove();
-        details.splice(index, 1);
-        calculateInvoiceTotals();
-    }
-
-    // Función para calcular y actualizar los totales de la factura
-    function calculateInvoiceTotals() {
-        let subtotal = 0;
-        let totalIva = 0;
-        let total = 0;
-        let discount = parseFloat(discountInput.value) || 0;
-        let payment = parseFloat(paymentInput.value) || 0;
-
-        for (const detail of details) {
-            subtotal += detail.price * detail.quantity;
-            totalIva += detail.price * detail.quantity * (detail.iva_percentage.value / 100);
-        }
-
-        total = subtotal + totalIva - discount;
-        let change = payment - total;
-
-        subtotalInput.value = subtotal.toFixed(2);
-        ivaInput.value = totalIva.toFixed(2);
-        totalInput.value = total.toFixed(2);
-        changeInput.value = change.toFixed(2);
-    }
-
-    // Event listeners para el formulario y los botones
-    addButton.addEventListener('click', function() {
-        const selectedProduct = productSelect.options[productSelect.selectedIndex];
-        const detail = {
-            id: selectedProduct.value,
-            product: selectedProduct.dataset.id,
-            product__description: selectedProduct.dataset.des,
-            price: parseFloat(selectedProduct.dataset.price),
-            quantify: parseFloat(quantityInput.value),
-            iva_percentage: {
-                value: parseFloat(selectedProduct.dataset.iva)
-            }
-        };
-        details.push(detail);
-        addDetailRow(detail);
-        calculateInvoiceTotals();
-    });
-
-    discountInput.addEventListener('input', calculateInvoiceTotals);
-    paymentInput.addEventListener('input', calculateInvoiceTotals);
-
-    // Cargar detalles iniciales si existen (en edición)
-    loadInitialDetails('{{ detail_sales|safe }}');
+    var save_url = "{{save_url}}";
+    var detail_sales = JSON.parse("{{ detail_sales|escapejs }}");
 </script>
-
-
-{% endblock %}
+<script src="{% static 'js/invoices/sales.js' %}"></script>
+{% endblock %}

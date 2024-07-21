@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Factura Electrónica</title>
+    <style>
+        @page {
+            size: a4 portrait;
+            @frame header_frame {           
+                -pdf-frame-content: header_content;
+                left: 50pt; width: 512pt; top: 50pt; height: 40pt;
+            }
+            @frame content_frame {          
+                left: 50pt; width: 512pt; top: 90pt; height: 632pt;
+            }
+            @frame footer_frame {           
+                -pdf-frame-content: footer_content;
+                left: 50pt; width: 512pt; top: 772pt; height: 20pt;
+            }
+        }
+        body {
+            font-family: Helvetica, sans-serif;
+            font-size: 12px;
+            color: #333;
+        }
+        .header {
+            background-color: #4a90e2;
+            color: white;
+            padding: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .total {
+            font-weight: bold;
+        }
+        .text-right {
+            text-align: right;
+        }
+        .mt-8 {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="header_content" class="header">
+        <h1>Factura Electrónica</h1>
+        <p>Nº {{ invoice.id }}</p>
+        <p>Fecha de emisión: {{ invoice.issue_date|date:"d/m/Y" }}</p>
+    </div>
+
+    <div id="content_frame">
+        <div class="mt-8">
+            <table>
+                <tr>
+                    <td>
+                        <h2>Facturado a:</h2>
+                        <p>{{ invoice.customer.get_full_name }}</p>
+                        <p>{{ invoice.customer.email }}</p>
+                    </td>
+                    <td class="text-right">
+                        <h2>Empresa:</h2>
+                        {% for comp in company %}
+                            <p>{{comp.name}}</p>
+                            {% if comp.logo %}
+                                <img src="{{comp.logo.url}}" alt="Logo de {{ comp.name }}" style="width: 100px; height: auto;">
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="mt-8">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Precio Unitario</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for detail in invoice.detail.all %}
+                        <tr>
+                            <td>{{ detail.product.description }}</td>
+                            <td>{{ detail.quantity }}</td>
+                            <td>${{ detail.price }}</td>
+                            <td>${{ detail.subtotal }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="mt-8 text-right">
+            <p><strong>Subtotal:</strong> ${{ invoice.subtotal }}</p>
+            <p><strong>IVA:</strong> ${{ invoice.iva }}</p>
+            <p><strong>Descuento:</strong> ${{ invoice.discount }}</p>
+            <p class="total"><strong>Total:</strong> ${{ invoice.total }}</p>
+        </div>
+    </div>
+
+    <div id="footer_content">
+        <p>Gracias por su compra. Para cualquier consulta, por favor contáctenos.</p>
+    </div>
+</body>
+</html>
