@@ -2,7 +2,7 @@
 {% block content %}
     {% load static %}
     <title>{% block title %}{{ title1 }}{% endblock title %}</title>
-    <section class="dark:bg-principal mt-20"> 
+    <section class="dark:bg-principal mt-20">
         <div class="text-center mt-10" data-aos="fade-up" data-aos-delay="200">
             <div class="sm:pt-28 lg:pt-24">
                 <div class="flex flex-col items-center justify-center">
@@ -28,74 +28,76 @@
                                     d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
                             </svg>
                         </div>
-                        <form method="GET" action="{% url 'core:supplier_list' %}">
+                        <form method="GET" action="{% url 'sales:sales_list' %}">
                             <input type="text" name="q" id="table-search"
                                 class="text-center pl-10 shadow-sm bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 pr-12 dark:bg-principal dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"
                                 placeholder="Búsqueda sin límites" value="{{ request.GET.q }}">
                         </form>
                     </div>
                 </div>
-                <!-- Tabla de ventas -->
-                <div class="overflow-x-auto">
-                    <table class="w-full text-center text-lg">
-                        <thead class="uppercase font-Tiny5 bg-gray-50 dark:bg-secundario dark:text-blue-300">
-                            <tr>
-                                <th scope="col" class="px-6 py-3">Factura</th>
-                                <th scope="col" class="px-6 py-3">Cliente</th>
-                                <th scope="col" class="px-6 py-3">Fecha Emisión</th>
-                                <th scope="col" class="px-6 py-3">Método de Pago</th>
-                                <th scope="col" class="px-6 py-3">Iva</th>
-                                <th scope="col" class="px-6 py-3">Subtotal</th>
-                                <th scope="col" class="px-6 py-3">Total</th>
-                                <th scope="col" class="px-6 py-3">Estado</th>
-                                <th scope="col" class="px-6 py-3">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            
-                            {% for item in invoices %} 
-                                <tr class="dark:text-gray-400 bg-white border-b dark:bg-[#0b1121] dark:border-secundario hover:bg-gray-50 dark:hover:bg-[#121c33]">
-                                    <td class="px-6 py-4">{{ item.id }}</td>
-                                    <td class="px-6 py-4">{{ item.customer.get_full_name }}</td>
-                                    <td class="px-6 py-4">{{ item.issue_date|date:"d/m/Y H:i" }}</td>
-                                    <td class="px-6 py-4">{{ item.payment_method }}</td> 
-                                    <td class="px-6 py-4">${{ item.iva }}</td>
-                                    <td class="px-6 py-4">${{ item.subtotal }}</td>
-                                    <td class="px-6 py-4">${{ item.total }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                            {% if item.state == 'F' %} bg-green-100 text-green-800
-                                            {% elif item.state == 'A' %} bg-red-100 text-red-800
-                                            {% else %} bg-yellow-100 text-yellow-800
-                                            {% endif %}">
-                                            {{ item.get_state_display }} 
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                        <div class="flex space-x-2">
-                                            {% if not item.state == "A" and permissions.change_invoice %}
-                                            <a href="{% url 'sales:sales_update' pk=item.id %}" class="text-blue-600 hover:text-blue-700 dark:text-blue-500 dark:hover:text-blue-400">
-                                                <i class="fa-solid fa-pen-to-square"></i> Editar
-                                            </a>
-                                            {% endif %}
-                                            {% if permissions.delete_invoice %}
-                                            <button onclick="openDeleteModal('{{ item.id }}', '{{ item.customer.get_full_name }}', 'cancel')" class="text-yellow-600 hover:text-yellow-700 dark:text-yellow-500 dark:hover:text-yellow-400">
-                                                <i class="fas fa-ban"></i> Anular
-                                            </button>
-                                            <button onclick="openDeleteModal('{{ item.id }}', '{{ item.customer.get_full_name }}', 'delete')" class="text-red-600 hover:text-red-700 dark:text-red-500 dark:hover:text-red-400">
-                                                <i class="fa-solid fa-trash"></i> Eliminar
-                                            </button>
-                                            {% endif %}
-                                            <a href="{% url 'sales:sales_consult' pk=item.id %}" class="text-green-600 hover:text-green-700 dark:text-green-500 dark:hover:text-green-400">
-                                                <i class="fa-solid fa-eye"></i> Ver
-                                            </a>
-                                        </div>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>                
+
+        <div class="lg:p-4 rounded-3xl" data-aos="fade-up" data-aos-delay="200">
+            <div class="overflow-x-auto">
+                <table class="w-full text-center text-lg">
+                    <thead class="uppercase font-Tiny5 bg-gray-50 dark:bg-secundario dark:text-blue-300">
+                        <tr>
+                            <th scope="col" class="px-6 py-3">Factura</th>
+                            <th scope="col" class="px-6 py-3">Cliente</th>
+                            <th scope="col" class="px-6 py-3">Fecha Emisión</th>
+                            <th scope="col" class="px-6 py-3">Método de Pago</th>
+                            <th scope="col" class="px-6 py-3">Iva</th>
+                            <th scope="col" class="px-6 py-3">Subtotal</th>
+                            <th scope="col" class="px-6 py-3">Total</th>
+                            <th scope="col" class="px-6 py-3">Estado</th>
+                            <th scope="col" class="px-6 py-3">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in invoices %}
+                        <tr class="dark:text-gray-400 bg-white border-b dark:bg-[#0b1121] dark:border-secundario hover:bg-gray-50 dark:hover:bg-[#121c33]">
+                            <td class="px-6 py-4">{{ item.id }}</td>
+                            <td class="px-6 py-4">{{ item.customer.get_full_name }}</td>
+                            <td class="px-6 py-4">{{ item.issue_date|date:"d/m/Y H:i" }}</td>
+                            <td class="px-6 py-4">{{ item.payment_method }}</td>
+                            <td class="px-6 py-4">${{ item.iva }}</td>
+                            <td class="px-6 py-4">${{ item.subtotal }}</td>
+                            <td class="px-6 py-4">${{ item.total }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span
+                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
+                                        {% if item.state == 'F' %} bg-green-100 text-green-800
+                                        {% elif item.state == 'A' %} bg-red-100 text-red-800
+                                        {% else %} bg-yellow-100 text-yellow-800
+                                        {% endif %}">
+                                    {{ item.get_state_display }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <div class="flex space-x-2">
+                                    {% if not item.state == "A" and permissions.change_invoice %}
+                                    <a href="{% url 'sales:sales_update' pk=item.id %}" class="text-blue-600 hover:text-blue-700 dark:text-blue-500 dark:hover:text-blue-400">
+                                        <i class="fa-solid fa-pen-to-square"></i> Editar
+                                    </a>
+                                    {% endif %}
+                                    {% if permissions.delete_invoice %}
+
+                                        {% if item.issue_date|timesince <= "3 days" and item.state != 'A' %}
+                                        <button onclick="openDeleteModal('{{ item.id }}', '{{ item.customer.get_full_name }}', 'cancel')" class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"><i class="fas fa-times"></i> Anular</button>
+                                        {% endif %}
+
+                                        <button onclick="openDeleteModal('{{ item.id }}', '{{ item.customer.get_full_name }}', 'delete')" class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"><i class="fa-solid fa-trash"></i>Eliminar</button>
+
+                                    {% endif %}
+                                    <a href="{% url 'sales:sales_consult' pk=item.id %}" class="text-green-600 hover:text-green-700 dark:text-green-500 dark:hover:text-green-400">
+                                        <i class="fa-solid fa-eye"></i> Ver
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
                 <!-- Paginación -->
                 <div class="flex justify-center mt-4">
                     <nav aria-label="Page navigation example">
@@ -143,13 +145,11 @@
 
     {% include 'core/cancel.html' %}
     <script>
-        function openDeleteModal(id, name) {
+        function openDeleteModal(id, name, action) {
             const deleteForm = document.getElementById('deleteForm');
             const modalTitle = document.getElementById('Description');
             const submitButton = deleteForm.querySelector('button[type="submit"]');
-        
-            const action = event.target.dataset.action; // Obtener la acción del botón
-        
+
             if (action === 'cancel') {
                 deleteForm.action = `{% url 'sales:sales_cancel' 0 %}`.replace('0', id);
                 modalTitle.textContent = `Anular Factura ID: ${id} - ${name}`;
@@ -161,11 +161,11 @@
             }
             document.getElementById('deleteModal').classList.remove('hidden');
         }
-    
+
         function closeModal() {
             document.getElementById('deleteModal').classList.add('hidden');
         }
     </script>
-    
+
 
 {% endblock %} 

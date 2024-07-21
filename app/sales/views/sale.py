@@ -12,9 +12,10 @@ from app.security.instance.menu_module import MenuModule
 from app.security.mixins.mixins import CreateViewMixin, DeleteViewMixin, ListViewMixin, PermissionMixin, UpdateViewMixin
 from django.views.generic import CreateView, ListView, UpdateView, DeleteView, View, TemplateView
 from django.contrib import messages
-from django.db.models import Q,F
+from django.db.models import Q, F
 from decimal import Decimal
 from datetime import timedelta
+from datetime import date
 from proy_sales import settings
 from proy_sales.utils import custom_serializer, save_audit
 from django.shortcuts import redirect, get_object_or_404, render
@@ -26,24 +27,25 @@ from io import BytesIO
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
-class SaleListView(PermissionMixin,ListViewMixin, ListView):
+class SaleListView(PermissionMixin, ListViewMixin, ListView):
     template_name = 'sales/invoices/list.html'
     model = Invoice
     context_object_name = 'invoices'
     permission_required = 'view_invoice'
-    
+
     def get_queryset(self):
         self.query = Q(active=True)
-        q1 = self.request.GET.get('q') # ver
-        if q1 is not None: 
-            self.query.add(Q(id = q1), Q.OR) 
-            self.query.add(Q(customer__first_name__icontains=q1), Q.OR) 
-            self.query.add(Q(customer__last_name__icontains=q1), Q.OR) 
+        q1 = self.request.GET.get('q')  # ver
+        if q1 is not None:
+            self.query.add(Q(id=q1), Q.OR)
+            self.query.add(Q(customer__first_name__icontains=q1), Q.OR)
+            self.query.add(Q(customer__last_name__icontains=q1), Q.OR)
         return self.model.objects.filter(self.query).order_by('id')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         queryset = self.get_queryset()
+        context['now'] = timezone.now()
         paginator = Paginator(queryset, self.paginate_by)
 
         page = self.request.GET.get('page')
@@ -191,74 +193,75 @@ class SaleUpdateView(PermissionMixin,UpdateViewMixin, UpdateView):
 
 class SaleCancelView(PermissionMixin, View):
     permission_required = 'delete_invoice'
-    
+
     def post(self, request, *args, **kwargs):
         try:
             sale = Invoice.objects.get(id=self.kwargs.get('pk'))
+
             if sale.state == 'A':
-                messages.error(self.request, "LA VENTA YA ESTÁ ANULADA")
-                return redirect('sales:sales_list') 
+                messages.error(self.request, "La venta ya está anulada.")
+                return redirect('sales:sales_list')
 
             current_time = timezone.now()
             time_difference = current_time - sale.issue_date
-            if time_difference > timedelta(days=3):
-                messages.error(self.request, "La venta ya no puede ser anulada, pasaron los dias establecidos")
-                return redirect('sales:sales_list') 
-            
-            
-            with transaction.atomic():
-                sale.state = 'A'  # Estado de "Anulado"
-                sale.save()
-                
-                details = InvoiceDetail.objects.filter(invoice_id=sale.id)
-                for detail in details:
-                    product = detail.product
-                    product.stock += detail.quantity
-                    product.save()
-                    
-                save_audit(request, sale, "A")
-                messages.success(self.request, f"Éxito al anular la venta F#{sale.id}")
-                return redirect('sales:sales_list') 
+
+            if time_difference <= timedelta(days=3):  # Corregir la condición de anulación
+                with transaction.atomic():
+                    sale.state = 'A'  # Estado de "Anulado"
+                    sale.save()
+
+                    details = InvoiceDetail.objects.filter(invoice_id=sale.id)
+                    for detail in details:
+                        product = detail.product
+                        product.stock += detail.quantity
+                        product.save()
+
+                    save_audit(request, sale, "A")
+                    messages.success(self.request, f"Éxito al anular la venta F#{sale.id}")
+            else:
+                messages.error(request, "La venta no puede ser anulada. Han pasado más de 3 días desde su emisión.")
+
         except Invoice.DoesNotExist:
-            messages.error(self.request, "Factura No encontrada")
-            return redirect('sales:sales_list') 
+            messages.error(request, "Factura no encontrada.")
         except Exception as ex:
-            return JsonResponse({"msg": str(ex)}, status=400)
+            messages.error(request, f"Error al anular la venta: {ex}")  # Mensaje de error más específico
+
+        return redirect('sales:sales_list')
         
 class SaleDeleteView(PermissionMixin, View):
     permission_required = 'delete_invoice'
-    
+
     def post(self, request, *args, **kwargs):
         try:
             sale = Invoice.objects.get(id=self.kwargs.get('pk'))
             current_time = timezone.now()
-            
-            if sale.active == False:
-                messages.error(self.request, f"Error al eliminar la venta")
-                return redirect('sales:sales_list') 
-            
-            if sale.issue_date.date() != current_time.date():
-                messages.error(self.request, f"Error al eliminar la venta")
-                return redirect('sales:sales_list') 
-            
-            with transaction.atomic():
-                sale.active = False  # Estado de "Cancelado"
-                sale.save()
-                
-                details = InvoiceDetail.objects.filter(invoice_id=sale.id)
-                for detail in details:
-                    product = detail.product
-                    product.stock += detail.quantity
-                    product.save()
-                    
-                save_audit(request, sale, "False")
-                messages.success(request, f"Éxito al eliminar la venta F#{sale.id}")
-                return redirect('sales:sales_list') 
+
+            if not sale.active:  # Corregido a 'not sale.active'
+                messages.error(self.request, "Error al eliminar la venta. La factura no está activa.")
+                return redirect('sales:sales_list')
+
+            if sale.issue_date.date() == current_time.date():  # Corregido para comparar solo la fecha
+                with transaction.atomic():
+                    sale.active = False  # Estado de "Cancelado"
+                    sale.save()
+
+                    details = InvoiceDetail.objects.filter(invoice_id=sale.id)
+                    for detail in details:
+                        product = detail.product
+                        product.stock += detail.quantity
+                        product.save()
+
+                    save_audit(request, sale, "False")
+                    messages.success(request, f"Éxito al eliminar la venta F#{sale.id}")
+            else:
+                messages.error(request, "Error al eliminar la venta. Solo se pueden eliminar facturas del día actual.")
+
         except Invoice.DoesNotExist:
-            
-            return redirect('sales:sales_list') 
+            messages.error(request, "Factura no encontrada.")  # Mensaje de error más específico
         except Exception as ex:
-            return JsonResponse({"msg": str(ex)}, status=400)
+            messages.error(request, f"Error al eliminar la venta: {ex}")  # Mensaje de error más específico
+
+        return redirect('sales:sales_list')
 
 class SalesConsultView(TemplateView):
     template_name = 'sales/invoices/consult.html'

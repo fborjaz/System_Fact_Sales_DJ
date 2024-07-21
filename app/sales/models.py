@@ -12,7 +12,7 @@ class Invoice(models.Model):
     total = models.DecimalField(verbose_name='Total',default=0, max_digits=16, decimal_places=2)
     payment = models.DecimalField(verbose_name='Pago',default=0, max_digits=16, decimal_places=2)
     change = models.DecimalField(verbose_name='Cambio',default=0, max_digits=16, decimal_places=2)
-    state = models.CharField(verbose_name='Estado',max_length=1,choices=(('N','Normal'),('A','Anulada')),default='N')  
+    state = models.CharField(verbose_name='Estado',max_length=1,choices=(('N','Normal'),('A','Anulada')),default='N')
     active = models.BooleanField(verbose_name='Activo',default=True)
     
     class Meta:
