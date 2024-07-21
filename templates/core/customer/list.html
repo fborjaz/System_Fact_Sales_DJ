@@ -1,40 +1,59 @@
 {% extends 'components/base.html' %}
-{% load static %}
 {% block content %}
-<title>{% block title %} {{ title1 }} {% endblock title %}</title>
-
-<section class="dark:bg-principal mt-20">
-    <div class="text-center" data-aos="fade-up" data-aos-delay="200">
-        <div class="sm:pt-28 lg:pt-24">
-            <div class="flex flex-col items-center justify-center">
-                <span class="rounded-full bg-indigo-500 px-2 py-1 text-white uppercase text-sm">
-                    {{ title1 }}
-                </span>
-            </div>
-            <h1 class="dark:text-white text-4xl text-center mt-6 font-Pacifico">
-                {{ title2 }}
-            </h1>
-            <p class="dark:text-gray-400 text-center mt-6 text-lg font-light">
+    {% load static %}
+    <title>{% block title %}{{ title1 }}{% endblock title %}</title>
+    <section class="dark:bg-principal">
+        <div class="text-center" data-aos="fade-up" data-aos-delay="200">
+            <div class="sm:pt-28 lg:pt-24">
+                <div class="flex flex-col items-center justify-center">
+                    <span class="rounded-full bg-indigo-500 px-2 py-1 text-white uppercase text-sm">
+                        {{ title1 }}
+                    </span>
+                </div>
+                <h1 class="dark:text-white text-4xl text-center mt-6 font-Pacifico">
+                    {{ title2 }}
+                </h1>
+                <p class="dark:text-gray-400 text-center mt-6 text-lg font-light">
                 Gestione sus clientes.
-            </p>
-        </div>
+                </p>
+            </div>
+
+            <!-- Barra de búsqueda -->
+            <div class="p-4 flex justify-center">
+                <label for="table-search" class="sr-only">Search</label>
+                <div class="relative mt-1">
+                    <div class="absolute inset-y-0 rtl:inset-r-0 start-0 flex items-center ps-3 pointer-events-none">
+                        <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
+                             xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
+                        </svg>
+                    </div>
+                    <form method="GET" action="{% url 'core:customer_list' %}">
+                        <input type="text" name="q" id="table-search"
+                               class="text-center pl-10 shadow-sm bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 pr-12 dark:bg-principal dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"
+                               placeholder="Búsqueda sin límites" value="{{ request.GET.q }}">
+                    </form>
+                </div>
+            </div>
 
         <div class="m-4 lg:m-8 sm:mx-40 sm:my-2 lg:grid lg:grid-cols-4 gap-8 lg:mx-20 lg:p-4 rounded-3xl" data-aos="fade-up" data-aos-delay="200">
-            {% for customer in customers %}  <div class="mb-4 flex justify-center custom-transform">
+            {% for customer in customers %}
+            <div class="mb-4 flex justify-center custom-transform">
                     <div class="dark:bg-secundario relative w-full overflow-hidden rounded-lg border border-gray-100 bg-white shadow-md dark:border-none">
                         <div class="dark:bg-secundario text-center card card-custom">
                             {% if customer.image %}
                                 <figure class="px-10 pt-10">
                                     <img src="{{ customer.image.url }}" alt="Customer Image" class="rounded-xl w-full">
-                                </figure>   
+                                </figure>
                             {% else %}
                                 <figure class="px-10 pt-10">
                                     <img src="{% static 'img/default_person.png' %}" alt="Default Image" class="rounded-xl w-full">
-                                </figure> 
+                                </figure>
                             {% endif %}
-                            
+
                             <h1 class="dark:text-blue-400 text-2xl text-center mt-6 font-black uppercase font-Tiny5">
-                                {{ customer.get_full_name }}  
+                                {{ customer.get_full_name }}
                             </h1>
                             <div class="dark:bg-contenedores p-4 card-body flex flex-col justify-center items-center">
                                 <h3 class="dark:text-blue-300 font-Pacifico">DNI: <span class="font-light font-Quicksand dark:text-gray-400">{{ customer.dni }}</span></h3>
