@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     'widget_tweaks',
     'tailwind',
     'theme',
+    'django_xhtml2pdf',
 ]
 
 GRAPH_MODELS = {

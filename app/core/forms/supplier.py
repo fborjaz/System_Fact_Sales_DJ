@@ -283,7 +283,7 @@ class SupplierForm(ModelForm):
 
   class Meta:
     model = Supplier
-    fields = ["name", "ruc", "address", "phone", "active", "image"]
+    fields = ["name", "ruc", "address", "phone", "latitude", "longitude", "active", "image"]
     error_messages = {
         "ruc": {
                 "unique": "Ya existe un proveedor con este RUC.",
@@ -320,7 +320,7 @@ class SupplierForm(ModelForm):
           "class": "shadow-sm bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-12 dark:bg-principal dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light",
         }
       ),
-            "latitude": forms.TextInput(
+        "latitude": forms.TextInput(
         attrs={
           "placeholder": "Coordenada: latitud",
           "id": "id_latitude",
@@ -348,12 +348,14 @@ class SupplierForm(ModelForm):
       ),
     }
     labels = {
-      "name": "Nombre",
-      "ruc": "Dni",
-      "address": "Dirección",
-      "phone": "Celular",
-      "state": "Estado",
-      "image": "Imagen Del Proveedor",
+        "name": "Nombre",
+        "ruc": "Dni",
+        "address": "Dirección",
+        "phone": "Celular",
+        "latitude": "Latitud",
+        "longitude": "Longitud",
+        "state": "Estado",
+        "image": "Imagen Del Proveedor",
     }
 
   def clean_name(self):
