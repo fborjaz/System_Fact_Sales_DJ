@@ -56,8 +56,9 @@
                                 </div>
                                 <div class="mb-8">
                                     <label for="{{ form.address.id_for_label }}"
-                                           class="dark:text-blue-300 font-black uppercase text-lg">{{ form.address.label }}</label>
+                                        class="dark:text-blue-300 font-black uppercase text-lg">{{ form.address.label }}</label>
                                     {{ form.address }}
+                                    {{ form.address_hidden }}
                                 </div>
                             </div>
                             <div>
@@ -77,6 +78,7 @@
                                     <label for="{{ form.latitude.id_for_label }}"
                                         class="dark:text-blue-300 font-black uppercase text-lg">{{ form.latitude.label }}</label>
                                     {{ form.latitude }}
+                                    {{ form.latitude_hidden }}
                                 </div>
                             </div>
                             <div>
@@ -84,6 +86,7 @@
                                     <label for="{{ form.longitude.id_for_label }}"
                                         class="dark:text-blue-300 font-black uppercase text-lg">{{ form.longitude.label }}</label>
                                     {{ form.longitude }}
+                                    {{ form.longitude_hidden }}
                                 </div>
                             </div>
                         </div>
@@ -188,14 +191,18 @@ function initMap() {
     });
 
     function updateAndLockFields(lat, lng) {
-        latInput.value = lat;
-        lngInput.value = lng;
-        updateAddress(lat, lng);
+        // Limita la precisión de la latitud a 6 decimales
+        const roundedLat = lat.toFixed(6);
+        const roundedLng = lng.toFixed(6); // Limita la precisión de la longitud a 6 decimales
 
-        // Deshabilitar campos de entrada después de la selección
-        latInput.disabled = true;
-        lngInput.disabled = true;
-        addressInput.disabled = true;
+        latInput.value = roundedLat;
+        lngInput.value = roundedLng;
+        updateAddress(roundedLat, roundedLng); // Usa las coordenadas redondeadas
+
+        // Actualiza los campos ocultos con las coordenadas redondeadas
+        document.getElementById('id_latitude_hidden').value = roundedLat;
+        document.getElementById('id_longitude_hidden').value = roundedLng;
+        document.getElementById('id_address_hidden').value = addressInput.value;
     }
 
     function updateAddress(lat, lng) {

@@ -281,9 +281,14 @@ class SupplierForm(ModelForm):
     "class": "shadow-sm bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full dark:bg-principal dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light",
   }))
 
+  latitude_hidden = forms.CharField(widget=forms.HiddenInput(), required=False)
+  longitude_hidden = forms.CharField(widget=forms.HiddenInput(), required=False)
+  address_hidden = forms.CharField(widget=forms.HiddenInput(), required=False)
+
   class Meta:
     model = Supplier
-    fields = ["name", "ruc", "address", "phone", "latitude", "longitude", "active", "image"]
+    fields = ['name', 'ruc', 'address', 'phone', 'latitude', 'longitude', 'active', 'image',
+              'latitude_hidden', 'longitude_hidden', 'address_hidden']  # Incluye los campos ocultos
     error_messages = {
         "ruc": {
                 "unique": "Ya existe un proveedor con este RUC.",
@@ -329,8 +334,8 @@ class SupplierForm(ModelForm):
       ),
       "longitude": forms.TextInput(
         attrs={
-          "placeholder": "Coordenada: latitud",
-          "id": "id_latitude",
+          "placeholder": "Coordenada: longitud",
+          "id": "id_longitude",
           "class": "shadow-sm bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-12 dark:bg-principal dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light",
         }
       ),
@@ -357,6 +362,35 @@ class SupplierForm(ModelForm):
         "state": "Estado",
         "image": "Imagen Del Proveedor",
     }
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        latitude = cleaned_data.get('latitude')
+        longitude = cleaned_data.get('longitude')
+        address = cleaned_data.get('address')
+
+        latitude_hidden = cleaned_data.get('latitude_hidden')
+        longitude_hidden = cleaned_data.get('longitude_hidden')
+        address_hidden = cleaned_data.get('address_hidden')
+
+        if not latitude_hidden or not longitude_hidden:
+            # Si no se proporcionaron coordenadas ocultas, valida la dirección visible
+            if not address:
+                raise forms.ValidationError("Debes ingresar una dirección o seleccionar una ubicación en el mapa.")
+        else:
+            # Si se proporcionaron coordenadas ocultas, usa esas en lugar de las visibles
+            cleaned_data['latitude'] = latitude_hidden
+            cleaned_data['longitude'] = longitude_hidden
+            cleaned_data['address'] = address_hidden
+
+        return cleaned_data
+
+    def save(self, commit=True):
+        supplier = super().save(commit=False)
+        if commit:
+            supplier.save()
+        return supplier
 
   def clean_name(self):
     name = self.cleaned_data.get("name")
