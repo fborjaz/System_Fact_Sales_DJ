@@ -27,7 +27,7 @@
                         <h2 class="dark:text-blue-300 text-2xl text-center mt-6 font-Pacifico">Foto del Cliente</h2><br>
                         <div id="imagenPreview" class="flex justify-center">
                             {% if form.image.value %}
-                                <img id="imagenSeleccionada" src="{{ form.image.value.url }}" class="mx-auto d-block rounded-lg max-w-xs" alt="Foto del cliente">
+                                <img id="imagenSeleccionada" src="{{ form.image.value.url }}" class="mx-auto d-block rounded-lg max-w-xs" alt="Foto del compañia">
                             {% else %}
                                 <img id="imagenSeleccionada" src="{% static 'img/default_company.png' %}" class="mx-auto d-block rounded-lg max-w-xs" alt="Foto del cliente">
                             {% endif %}
