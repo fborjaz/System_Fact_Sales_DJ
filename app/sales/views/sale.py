@@ -139,6 +139,8 @@ class SaleUpdateView(PermissionMixin,UpdateViewMixin, UpdateView):
         print("detalle")
         detail_sale=json.dumps(detail_sale,default=custom_serializer)
         context['detail_sales']=detail_sale  #[{'id':1,'precio':2},{},{}]
+        context['title1'] = 'IC - Ventas'
+        context['title2'] = 'Actualizacion de una Venta'
         context['save_url'] = reverse_lazy('sales:sales_update',kwargs={"pk":self.object.id})
         print(detail_sale)
         return context
