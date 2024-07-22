@@ -96,8 +96,8 @@ class Supplier(models.Model):
   image = models.ImageField(verbose_name='Imagen', upload_to='suppliers/', blank=True, null=True)
   phone = models.CharField(verbose_name='Telefono', max_length=10, validators=[phone_regex])
   address = models.CharField(verbose_name='Direccion', max_length=200)
-  latitude = models.FloatField(blank=True, null=True)
-  longitude = models.FloatField(blank=True, null=True)
+  latitude = models.DecimalField(verbose_name='Latitud', max_digits=9, decimal_places=6, null=True, blank=True)
+  longitude = models.DecimalField(verbose_name='Longitud', max_digits=9, decimal_places=6, null=True, blank=True)
   active = models.BooleanField(verbose_name='Activo', default=True)
 
   class Meta:

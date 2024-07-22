@@ -12,13 +12,14 @@
                         {{ title1 }}
                     </span>
                 </div>
-                <h1 class="dark:text-white text-4xl  text-center mt-6 font-Pacifico">
+                <h1 class="dark:text-white text-4xl text-center mt-6 font-Pacifico">
                     {{ title2 }}
                 </h1>
             </div>
 
             <form method="post" enctype="multipart/form-data" class="space-y-6 py-4">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mx-4 lg:mx-20" data-aos="fade">
+
                     <!-- Columna de la izquierda -->
                     <div class="bg-white dark:bg-secundario rounded-3xl flex flex-col justify-center items-center p-8"
                          data-aos="fade-right" data-aos-delay="200">
@@ -41,6 +42,7 @@
                             {{ form.image }}
                         </div>
                     </div>
+
                     <!-- Columna de la derecha -->
                     <div class="p-4 rounded-3xl dark:bg-secundario bg-white flex flex-col justify-center items-center"
                          data-aos="fade-right" data-aos-delay="200">
@@ -70,9 +72,22 @@
                                     {{ form.phone }}
                                 </div>
                             </div>
-
-
+                            <div>
+                                <div class="mb-8">
+                                    <label for="{{ form.latitude.id_for_label }}"
+                                        class="dark:text-blue-300 font-black uppercase text-lg">{{ form.latitude.label }}</label>
+                                    {{ form.latitude }}
+                                </div>
+                            </div>
+                            <div>
+                                <div class="mb-8">
+                                    <label for="{{ form.longitude.id_for_label }}"
+                                        class="dark:text-blue-300 font-black uppercase text-lg">{{ form.longitude.label }}</label>
+                                    {{ form.longitude }}
+                                </div>
+                            </div>
                         </div>
+
                         <div class="mb-8 flex flex-col justify-center items-center">
                             <label for="{{ form.active.id_for_label }}"
                                    class="dark:text-blue-300 font-black uppercase text-lg">{{ form.active.label }}</label>
@@ -89,31 +104,141 @@
                             </a>
                         </div>
                     </div>
+
                 </div>
             </form>
         </div>
     </section>
 
-    <script>
-        const imagenInput = document.getElementById('{{ form.image.id_for_label }}');
-        const imagenSeleccionada = document.getElementById('imagenSeleccionada');
+    <div id="mapModal" class="hidden fixed inset-0 backdrop-blur-sm bg-opacity-50 flex items-center justify-center overflow-y-auto h-full w-full" data-aos="fade-up" data-aos-delay="200">
+        <div class="relative p-5 border w-3/4 md:w-1/2 lg:w-2/3 xl:w-1/2 shadow-lg rounded-md bg-white dark:bg-secundario dark:border-none">
+            <div class="text-center">
+                <h3 class="leading-6 text-2xl dark:text-blue-300 font-Pacifico my-2">Ubicación de Proveedor</h3>
+            </div>
+            <div id="map" style="height: 500px; width: 100%;"></div>
+            <input id="pac-input" class="controls mt-2" type="text" placeholder="Buscar ubicación">
 
-        imagenInput.addEventListener('change', function () {
-            const file = imagenInput.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    imagenSeleccionada.src = e.target.result;
-                }
-                reader.readAsDataURL(file);
+            <div class="flex flex-row items-center justify-center text-center sm:mt-6">
+                <button type="button" class="bg-blue-700 hover:bg-blue-800 text-white py-2 px-4 rounded-full mr-0 md:mr-2 mb-2 md:mb-0 flex items-center" onclick="closeModal()">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAXFvKOb3Vh7D1mqamXccmz1-9ovqaShDo&callback=initMap&libraries=places"
+    async defer></script>
+<script>
+function initMap() {
+    const latInput = document.getElementById('{{ form.latitude.id_for_label }}');
+    const lngInput = document.getElementById('{{ form.longitude.id_for_label }}');
+    const addressInput = document.getElementById('{{ form.address.id_for_label }}');
+    const initialLat = parseFloat(latInput.value) || -2.132434; // Latitud inicial de Guayaquil
+    const initialLng = parseFloat(lngInput.value) || -79.593447; // Longitud inicial de Guayaquil
+
+    const map = new google.maps.Map(document.getElementById('map'), {
+        center: { lat: initialLat, lng: initialLng },
+        zoom: 15
+    });
+
+    const input = document.getElementById('pac-input');
+    const searchBox = new google.maps.places.SearchBox(input);
+
+    // Asegúrate de que el input esté en el mapa antes de vincularlo
+    map.controls[google.maps.ControlPosition.TOP_CENTER].push(input);
+
+    const marker = new google.maps.Marker({
+        position: { lat: initialLat, lng: initialLng },
+        map: map,
+        draggable: true
+    });
+
+    // Manejar eventos de clic en el mapa y arrastre del marcador
+    map.addListener('click', (event) => {
+        placeMarkerAndPanTo(event.latLng, map);
+    });
+    marker.addListener('dragend', (event) => {
+        placeMarkerAndPanTo(event.latLng, map);
+    });
+
+    function placeMarkerAndPanTo(latLng, map) {
+        marker.setPosition(latLng);
+        map.panTo(latLng);
+        updateAndLockFields(latLng.lat(), latLng.lng());
+    }
+
+    // Manejar eventos de búsqueda
+    searchBox.addListener('places_changed', () => {
+        const places = searchBox.getPlaces();
+        if (places.length === 0) return;
+
+        const place = places[0];
+        if (!place.geometry) return;
+
+        // Si el lugar tiene límites de visualización, úsalos, si no, céntralo en la ubicación
+        if (place.geometry.viewport) {
+            map.fitBounds(place.geometry.viewport);
+        } else {
+            map.setCenter(place.geometry.location);
+            map.setZoom(17); // Nivel de zoom para una sola ubicación
+        }
+
+        marker.setPosition(place.geometry.location);
+        updateAndLockFields(place.geometry.location.lat(), place.geometry.location.lng());
+    });
+
+    function updateAndLockFields(lat, lng) {
+        latInput.value = lat;
+        lngInput.value = lng;
+        updateAddress(lat, lng);
+
+        // Deshabilitar campos de entrada después de la selección
+        latInput.disabled = true;
+        lngInput.disabled = true;
+        addressInput.disabled = true;
+    }
+
+    function updateAddress(lat, lng) {
+        const geocoder = new google.maps.Geocoder();
+        const latlng = { lat: parseFloat(lat), lng: parseFloat(lng) };
+        geocoder.geocode({ location: latlng }, (results, status) => {
+            if (status === 'OK' && results[0]) {
+                addressInput.value = results[0].formatted_address;
             } else {
-                '{% if form.image.value %}'
-                    imagenSeleccionada.src = "{{ form.image.value.url }}";
-                    '{% else %}'
-                    imagenSeleccionada.src = "{% static 'img/usuario_anonimo.png' %}";
-                    '{% endif %}'
+                addressInput.value = "Dirección no encontrada";
             }
         });
-    </script>
+    }
+}
+
+    function closeModal() {
+        document.getElementById('mapModal').classList.add('hidden');
+    }
+
+    document.getElementById('{{ form.address.id_for_label }}').addEventListener('focus', function() {
+        document.getElementById('mapModal').classList.remove('hidden');
+        initMap(); // Llama a initMap una vez que el modal esté visible
+    });
+
+    const imagenInput = document.getElementById('{{ form.image.id_for_label }}');
+    const imagenSeleccionada = document.getElementById('imagenSeleccionada');
+
+    imagenInput.addEventListener('change', function () {
+        const file = imagenInput.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                imagenSeleccionada.src = e.target.result;
+            }
+            reader.readAsDataURL(file);
+        } else {
+            '{% if form.image.value %}'
+                imagenSeleccionada.src = "{{ form.image.value.url }}";
+                '{% else %}'
+                imagenSeleccionada.src = "{% static 'img/usuario_anonimo.png' %}";
+                '{% endif %}'
+        }
+    });
+</script>
 
 {% endblock content %}

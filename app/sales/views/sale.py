@@ -32,6 +32,7 @@ class SaleListView(PermissionMixin, ListViewMixin, ListView):
     model = Invoice
     context_object_name = 'invoices'
     permission_required = 'view_invoice'
+    paginate_by = 5
 
     def get_queryset(self):
         self.query = Q(active=True)

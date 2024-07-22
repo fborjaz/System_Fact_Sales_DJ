@@ -29,6 +29,7 @@ class PurchaseListView(PermissionMixin, ListViewMixin, ListView):
     model = Purchase
     context_object_name = 'purchases'
     permission_required = 'view_purchase'
+    paginate_by = 5
 
     def get_queryset(self):
         queryset = self.model.objects.order_by('-issue_date')

@@ -16,7 +16,7 @@ class SupplierListView(PermissionMixin, ListViewMixin, ListView):
   template_name = 'core/suppliers/list.html'
   context_object_name = 'suppliers'
   permission_required = 'view_supplier'
-  paginate_by = 4
+  paginate_by = 5
 
   def get_queryset(self):
     q1 = self.request.GET.get('q')
@@ -44,6 +44,7 @@ class SupplierListView(PermissionMixin, ListViewMixin, ListView):
     context['title1'] = 'IC - Proveedores'
     context['title2'] = 'Consulta de Proveedores'
     context['create_url'] = reverse_lazy('core:category_create')
+    context['supplier_locations'] = list(Supplier.objects.values('name', 'latitude', 'longitude'))
     context['query'] = self.request.GET.get('q', '')
     return context
 
@@ -60,6 +61,7 @@ class SupplierCreateView(PermissionMixin, CreateViewMixin, CreateView):
     context['title1'] = 'IC - Crear Proveedor'
     context['title2'] = 'Proveedor'
     context['back_url'] = self.success_url
+    context['supplier_locations'] = list(Supplier.objects.filter(active=True).values('name', 'latitude', 'longitude'))
     return context
 
   def form_valid(self, form):
@@ -81,6 +83,7 @@ class SupplierUpdateView(PermissionMixin, UpdateViewMixin, UpdateView):
     context['title1'] = 'IC - Actualizar Proveedor '
     context['title2'] = 'Actualizar Datos del Proveedor '
     context['back_url'] = self.success_url
+    context['supplier_locations'] = list(Supplier.objects.filter(active=True).values('name', 'latitude', 'longitude'))
     return context
 
   def form_valid(self, form):
@@ -109,7 +112,7 @@ class SupplierDeleteView(PermissionMixin, DeleteViewMixin, DeleteView):
 
   def delete(self, request, *args, **kwargs):
     self.object = self.get_object()
-    success_message = f"Éxito al eliminar lógicamente la marca {self.object.description}."
+    success_message = f"Éxito al eliminar lógicamente el proveedor {self.object.description}."
     self.object.delete()
     messages.success(self.request, success_message)
     return super().delete(request, *args, **kwargs)
