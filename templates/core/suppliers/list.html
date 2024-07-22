@@ -63,7 +63,9 @@
                                 </td>
                                 <td class="px-6 py-4">{{ item.name }}</td>
                                 <td class="px-6 py-4">{{ item.ruc }}</td>
-                                <td class="px-6 py-4">{{ item.address }}</td>
+                                <td class="px-6 py-4">
+                                    <a href="https://www.google.com/maps/search/?api=1&query={{ item.address|urlencode }}" target="_blank">{{ item.address }}</a>
+                                </td>
                                 <td class="px-6 py-4">{{ item.phone }}</td>
                                 <td class="px-6 py-4">
                                     {% if item.active %}
@@ -138,6 +140,26 @@
     </section>
 
     {% include 'fragments/delete.html' %}
+<script>
+    const addresses = document.querySelectorAll('[id^="address-"]');
+    addresses.forEach(addressElement => {
+        addressElement.addEventListener('click', () => {
+            const address = addressElement.textContent;
+            const geocoder = new google.maps.Geocoder();
+            geocoder.geocode({ address: address }, (results, status) => {
+                if (status === 'OK' && results[0]) {
+                    const location = results[0].geometry.location;
+                    const url = `https://www.google.com/maps/search/?api=1&query=${location.lat()},${location.lng()}`;
+                    window.open(url, '_blank');
+                } else {
+                    // Manejar el caso en que no se pueda geocodificar la dirección
+                    alert('No se pudo encontrar la ubicación de esta dirección.');
+                }
+            });
+        });
+    });
+</script>
+
     <script>
         function openDeleteModal(id, name) {
             const deleteForm = document.getElementById('deleteForm');
