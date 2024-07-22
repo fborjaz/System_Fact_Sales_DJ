@@ -94,4 +94,4 @@ El objetivo principal de este proyecto es desarrollar un sistema integral de ges
     *   Abre tu navegador web y visita: [http://127.0.0.1:8000/](http://127.0.0.1:8000/) (para la interfaz principal)
     *   Accede al panel de administración: [http://127.0.0.1:8000/admin/](http://127.0.0.1:8000/admin/) (utiliza las credenciales del superusuario).
 
-## ¡Explora y disfruta de Sistema de Gestión de Eventos! 🎉
+## ¡Explora y disfruta de Sistema de Gestión de Ventas! 🧾
