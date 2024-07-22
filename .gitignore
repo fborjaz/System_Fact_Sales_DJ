@@ -1,6 +1,9 @@
 # Entorno virtual
 .venv/
 
+# Archivos Media base de datos
+media/
+
 # Archivos y directorios Python
 *.pyc
 *.pyo
