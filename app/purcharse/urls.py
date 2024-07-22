@@ -10,7 +10,7 @@ urlpatterns = [
     path('purchase/<int:pk>/cancel/', purchase.PurchaseCancelView.as_view(), name='purchase_cancel'),
     path("purchase/delete/<int:pk>/", purchase.PurchaseDeleteView.as_view(), name="purchase_delete"),
     path("purchase/consult/<int:pk>/", purchase.PurchaseConsultView.as_view(), name="purchase_consult"),
-    path('generate_pdf/<int:purchase_id>/', purchase.generate_purchase_pdf, name='generate_purchase_pdf'),
+    path('purchase/<int:purchase_id>/pdf/', purchase.generate_purchase_pdf, name='purchase_pdf'),
     # path('supplier_update/<int:pk>/', supplier.SupplierUpdateView.as_view(),name='supplier_update'),
     # path('supplier_delete/<int:pk>/', supplier.SupplierDeleteView.as_view(),name='supplier_delete'),
 ]

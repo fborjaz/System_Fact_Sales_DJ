@@ -29,7 +29,7 @@ class Purchase(models.Model):
         return self.purchase_detail.all()
 
 class PurchaseDetail(models.Model):
-    purchase = models.ForeignKey(Purchase, on_delete=models.PROTECT, related_name='purchase_detail', verbose_name='Compra')
+    purchase = models.ForeignKey(Purchase, on_delete=models.CASCADE, related_name='purchase_detail', verbose_name='Compra')
     product = models.ForeignKey(Product, on_delete=models.PROTECT, related_name='purchase_products')
     quantify = models.DecimalField(verbose_name='Cantidad', default=0, max_digits=8, decimal_places=2)
     cost = models.DecimalField(verbose_name='Costo', default=0, max_digits=16, decimal_places=2)

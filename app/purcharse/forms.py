@@ -4,7 +4,7 @@ from django import forms
 class PurchaseForm(forms.ModelForm):
     class Meta:
         model = Purchase
-        fields = '__all__'  
+        fields = ["supplier", "num_document", "issue_date", "subtotal", "iva", "total"]
         widgets = {
             "supplier": forms.Select(
                 attrs={
@@ -48,7 +48,7 @@ class PurchaseForm(forms.ModelForm):
 class PurchaseDetailForm(forms.ModelForm):
     class Meta:
         model = PurchaseDetail
-        fields = '__all__'
+        fields = ["purchase", "product", "quantify", "cost", "subtotal", "iva"]
         widgets = {
             'purchase': forms.Select(
                 attrs={

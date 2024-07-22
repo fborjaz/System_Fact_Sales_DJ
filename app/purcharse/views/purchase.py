@@ -1,25 +1,28 @@
-from io import BytesIO
 import json
-from django.http import JsonResponse, HttpResponse
-from django.db import transaction
-from django.urls import reverse_lazy
-from django.utils import timezone
-from django.views.generic import CreateView, ListView, UpdateView, DeleteView, View, TemplateView
-from django.contrib import messages
-from django.db.models import Q, F
 from decimal import Decimal
 from datetime import timedelta
-from datetime import date
-from django.shortcuts import redirect, get_object_or_404, render
+import logging
+
+from django.db import transaction, IntegrityError
+from django.db.models import Q
+from django.http import JsonResponse, HttpResponse
+from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import get_template
+from django.urls import reverse_lazy
+from django.utils import timezone
+from django.views.generic import CreateView, ListView, UpdateView, View, TemplateView
+from django.contrib import messages
+from django.core.paginator import Paginator
 from xhtml2pdf import pisa
+from io import BytesIO
+
 from app.core.models import Product, Supplier
 from app.purcharse.forms import PurchaseForm
 from app.purcharse.models import Purchase, PurchaseDetail
 from app.security.mixins.mixins import PermissionMixin, CreateViewMixin, UpdateViewMixin, ListViewMixin
 from proy_sales.utils import custom_serializer, save_audit
 
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+logger = logging.getLogger(__name__)
 
 class PurchaseListView(PermissionMixin, ListViewMixin, ListView):
     template_name = 'purchase/list.html'
@@ -28,28 +31,23 @@ class PurchaseListView(PermissionMixin, ListViewMixin, ListView):
     permission_required = 'view_purchase'
 
     def get_queryset(self):
-        self.query = Q()
-        q1 = self.request.GET.get('q')
-        if q1 is not None:
-            self.query.add(Q(id=q1), Q.OR)
-            self.query.add(Q(supplier__name__icontains=q1), Q.OR)
-        return self.model.objects.filter(self.query).order_by('id')
+        queryset = self.model.objects.order_by('-issue_date')
+        q = self.request.GET.get('q')
+        if q:
+            queryset = queryset.filter(
+                Q(id=q) | Q(supplier__name__icontains=q)
+            )
+        return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        queryset = self.get_queryset()
         context['now'] = timezone.now()
-        paginator = Paginator(queryset, self.paginate_by)
+        
+        paginator = Paginator(self.get_queryset(), self.paginate_by)
+        page = self.request.GET.get('page')
+        purchases = paginator.get_page(page)
 
-        purchase = self.request.GET.get('purchase')
-        try:
-            purchaese = paginator.page(purchase)
-        except PageNotAnInteger:
-            purchaese = paginator.page(1)
-        except EmptyPage:
-            purchaese = paginator.page(paginator.num_pages)
-
-        context['purchases'] = purchaese
+        context['purchases'] = purchases
         context['title1'] = 'IC - Compras'
         context['title2'] = 'Consulta de las Compras'
         context['create_url'] = reverse_lazy('purchase:purchase_create')
@@ -76,7 +74,7 @@ class PurchaseCreateView(PermissionMixin, CreateViewMixin, CreateView):
     def post(self, request, *args, **kwargs):
         form = self.get_form()
         if not form.is_valid():
-            messages.success(self.request, f"Error al registrar la compra: {form.errors}.")
+            messages.error(self.request, f"Error al registrar la compra: {form.errors}.")
             return JsonResponse({"msg": form.errors}, status=400)
         data = request.POST
         try:
@@ -104,9 +102,13 @@ class PurchaseCreateView(PermissionMixin, CreateViewMixin, CreateView):
                 save_audit(request, purchase, "A")
                 messages.success(self.request, f"Éxito al registrar la compra N#{purchase.id}")
                 return JsonResponse({"msg": "Éxito al registrar la compra"}, status=200)
+        except IntegrityError:
+            messages.error(self.request, "Error: Ya existe una compra con este número de documento.")
+            return JsonResponse({"msg": "Error: Ya existe una compra con este número de documento."}, status=400)
         except Exception as ex:
-            return JsonResponse({"msg": str(ex)}, status=400)
-
+            logger.exception(ex) 
+            messages.error(self.request, "Error inesperado al procesar la compra.")
+            return JsonResponse({"msg": "Error inesperado al procesar la compra."}, status=500)
 
 class PurchaseUpdateView(PermissionMixin, UpdateViewMixin, UpdateView):
     model = Purchase
@@ -130,7 +132,7 @@ class PurchaseUpdateView(PermissionMixin, UpdateViewMixin, UpdateView):
     def post(self, request, *args, **kwargs):
         form = self.get_form()
         if not form.is_valid():
-            messages.success(self.request, f"Error al actualizar la compra: {form.errors}.")
+            messages.error(self.request, f"Error al actualizar la compra: {form.errors}.")
             return JsonResponse({"msg": form.errors}, status=400)
         data = request.POST
         try:
@@ -167,11 +169,13 @@ class PurchaseUpdateView(PermissionMixin, UpdateViewMixin, UpdateView):
                 save_audit(request, purchase, "M")
                 messages.success(self.request, f"Éxito al modificar la compra N#{purchase.id}")
                 return JsonResponse({"msg": "Éxito al modificar la compra"}, status=200)
+        except IntegrityError:
+            messages.error(self.request, "Error: Ya existe una compra con este número de documento.")
+            return JsonResponse({"msg": "Error: Ya existe una compra con este número de documento."}, status=400)
         except Exception as ex:
-            return JsonResponse({"msg": str(ex)}, status=400)
-
-
-from django.db import IntegrityError
+            logger.exception(ex) 
+            messages.error(self.request, "Error inesperado al procesar la compra.")
+            return JsonResponse({"msg": "Error inesperado al procesar la compra."}, status=500)
 
 class PurchaseCancelView(PermissionMixin, View):
     permission_required = 'delete_purchase'
@@ -182,23 +186,22 @@ class PurchaseCancelView(PermissionMixin, View):
 
             if purchase.state == 'A':
                 messages.error(self.request, "La compra ya está anulada.")
-                return redirect('purchases:purchase_list')
+                return redirect('purchase:purchase_list')
 
             current_time = timezone.now()
             time_difference = current_time - purchase.issue_date
-
             if time_difference <= timedelta(days=3):
                 with transaction.atomic():
                     purchase.state = 'A'
                     purchase.save()
 
-                    details = PurchaseDetail.objects.filter(purchase_id=purchase.id)
-                    for detail in details:
+                    # Revertir el stock de los productos
+                    for detail in purchase.details:
                         product = detail.product
-                        product.stock += detail.quantity
+                        product.stock += detail.quantify
                         product.save()
 
-                    save_audit(request, purchase, "A")
+                    save_audit(request, purchase, "A")  # Registrar la anulación en la auditoría
                     messages.success(self.request, f"Éxito al anular la compra C#{purchase.id}")
             else:
                 messages.error(request, "La compra no puede ser anulada. Han pasado más de 3 días desde su emisión.")
@@ -206,7 +209,8 @@ class PurchaseCancelView(PermissionMixin, View):
         except Purchase.DoesNotExist:
             messages.error(request, "Compra no encontrada.")
         except Exception as ex:
-            messages.error(request, f"Error al anular la compra: {ex}")
+            logger.exception(ex)  # Registrar la excepción con detalles
+            messages.error(request, f"Error inesperado al anular la compra.")
 
         return redirect('purchase:purchase_list')
 
@@ -217,32 +221,18 @@ class PurchaseDeleteView(PermissionMixin, View):
     def post(self, request, *args, **kwargs):
         try:
             purchase = Purchase.objects.get(id=self.kwargs.get('pk'))
-            current_time = timezone.now()
 
-            if not purchase.active:  # Corregido a 'not sale.active'
-                messages.error(self.request, "Error al eliminar la venta. La factura de compra no está activa.")
-                return redirect('purchase:purchase_list')
+            with transaction.atomic():
+                PurchaseDetail.objects.filter(purchase=purchase).delete()
+                purchase.delete()
+                save_audit(request, purchase, "D")
+                messages.success(request, f"Éxito al eliminar la compra C# {purchase.id}")
 
-                if purchase.issue_date.date() == current_time.date():  # Corregido para comparar solo la fecha
-                    with transaction.atomic():
-                        purchase.active = False  # Estado de "Cancelado"
-                        purchase.save()
-
-                        details = InvoiceDetail.objects.filter(invoice_id=purchase.id)
-                        for detail in details:
-                            product = detail.product
-                            product.stock += detail.quantity
-                            product.save()
-
-                        save_audit(request, purchase, "False")
-                        messages.success(request, f"Éxito al eliminar la venta F#{purchase.id}")
-                else:
-                    messages.error(request, "Error al eliminar la venta. Solo se pueden eliminar facturas del día actual.")
-
-        except Invoice.DoesNotExist:
-            messages.error(request, "Factura de compra no encontrada.")  # Mensaje de error más específico
+        except Purchase.DoesNotExist:
+            messages.error(request, "Compra no encontrada.")
         except Exception as ex:
-            messages.error(request, f"Error al eliminar la compra: {ex}")  # Mensaje de error más específico
+            logger.exception(ex)
+            messages.error(request, f"Error inesperado al eliminar la compra.")
 
         return redirect('purchase:purchase_list')
 
@@ -254,23 +244,20 @@ class PurchaseConsultView(TemplateView):
         purchase_id = self.kwargs.get('pk')
         purchase = get_object_or_404(Purchase, pk=purchase_id)
         context['purchase'] = purchase
-        context['details'] = purchase.purchase_detail.all()
         return context
 
 
 def generate_purchase_pdf(request, purchase_id):
     purchase = get_object_or_404(Purchase, id=purchase_id)
-    template = get_template('purchase/pdfgenerate.html')
-    context = {
-        'purchase': purchase,
-    }
+    template = get_template('purchase/pdfgenera.html')
+    context = {'purchase': purchase,}
     html = template.render(context)
     result = BytesIO()
     pdf = pisa.pisaDocument(BytesIO(html.encode("UTF-8")), result)
     if not pdf.err:
         response = HttpResponse(result.getvalue(), content_type='application/pdf')
         filename = f"purchase_{purchase_id}.pdf"
-        content = f"attachment; filename={filename}"
+        content = f"inline; filename={filename}"
         response['Content-Disposition'] = content
         return response
     return HttpResponse("Error generando el PDF", status=400)
