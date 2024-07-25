@@ -22,7 +22,7 @@ El objetivo principal de este proyecto es desarrollar un sistema integral de ges
 *   **Frontend:**
     *   **HTML, CSS, JavaScript:** Lenguajes esenciales para construir la interfaz de usuario.
     *   **Font Awesome:** Biblioteca de iconos para añadir elementos visuales atractivos.
-    *   **
+    *   **Tailwind:** 
 
 ## ⚙️ Cómo Ejecutar la Aplicación
 
